@@ -17,71 +17,92 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-map-marker-alt"></i> خدمات قريبة - Nearby Services Tunisia</h1>
-            <p class="subtitle">ابحث عن خدمات النقل، الأطباء، والخدمات الأخرى القريبة من موقعك</p>
+            <div class="header-content">
+                <div class="header-title">
+                    <h1><i class="fas fa-map-marker-alt"></i> <span data-translate="title">خدمات قريبة - Nearby Services Tunisia</span></h1>
+                    <p class="subtitle" data-translate="subtitle">ابحث عن خدمات النقل، الأطباء، والخدمات الأخرى القريبة من موقعك</p>
+                </div>
+                <div class="lang-dropdown">
+                    <button class="lang-btn" id="lang-btn">
+                        <i class="fas fa-language"></i>
+                        <span id="current-lang">العربية</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="lang-list" id="lang-list">
+                        <a href="#" data-lang="ar">العربية</a>
+                        <a href="#" data-lang="en">English</a>
+                        <a href="#" data-lang="fr">Français</a>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <main>
             <div class="app-container">
                 <div class="left-panel">
                     <div class="location-section card">
-                        <h2><i class="fas fa-location-dot"></i> موقعك</h2>
+                        <h2><i class="fas fa-location-dot"></i> <span data-translate="location">موقعك</span></h2>
                         <div class="location-info">
                             <div id="location-status">
-                                <p>اضغط على الزر لاستخدام موقعك أو أدخل الإحداثيات يدوياً.</p>
+                                <p data-translate="location_instruction">اضغط على الزر لاستخدام موقعك أو أدخل الإحداثيات يدوياً.</p>
                             </div>
                             <div class="coordinates-input">
                                 <div class="input-group">
-                                    <label for="latitude">خط العرض:</label>
+                                    <label for="latitude" data-translate="latitude">خط العرض:</label>
                                     <input type="number" id="latitude" placeholder="مثال: 36.8065" step="0.0001">
                                 </div>
                                 <div class="input-group">
-                                    <label for="longitude">خط الطول:</label>
+                                    <label for="longitude" data-translate="longitude">خط الطول:</label>
                                     <input type="number" id="longitude" placeholder="مثال: 10.1815" step="0.0001">
                                 </div>
                             </div>
                             <div class="button-group">
                                 <button id="get-location-btn" class="btn primary">
-                                    <i class="fas fa-location-crosshairs"></i> استخدام موقعي
+                                    <i class="fas fa-location-crosshairs"></i>
+                                    <span data-translate="use_my_location">استخدام موقعي</span>
                                 </button>
                                 <button id="use-default-btn" class="btn secondary">
-                                    <i class="fas fa-map-pin"></i> استخدام تونس
+                                    <i class="fas fa-map-pin"></i>
+                                    <span data-translate="use_tunisia">استخدام تونس</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     <div class="filters-section card">
-                        <h2><i class="fas fa-filter"></i> الفلاتر</h2>
+                        <h2><i class="fas fa-filter"></i> <span data-translate="filters">الفلاتر</span></h2>
                         <div class="filter-group">
-                            <label for="category-select">نوع الخدمة:</label>
+                            <label for="category-select" data-translate="service_type">نوع الخدمة:</label>
                             <select id="category-select">
-                                <option value="all">جميع الخدمات</option>
-                                <option value="transporter">خدمات النقل</option>
-                                <option value="doctor">أطباء وخدمات طبية</option>
-                                <option value="pharmacy">صيدليات</option>
-                                <option value="mechanic">تصليح السيارات</option>
-                                <option value="restaurant">مطاعم</option>
-                                <option value="technician">خدمات تقنية</option>
+                                <option value="all" data-translate="all_services">جميع الخدمات</option>
+                                <option value="transporter" data-translate="transport_services">خدمات النقل</option>
+                                <option value="doctor" data-translate="medical_services">أطباء وخدمات طبية</option>
+                                <option value="pharmacy" data-translate="pharmacies">صيدليات</option>
+                                <option value="mechanic" data-translate="car_repair">تصليح السيارات</option>
+                                <option value="restaurant" data-translate="restaurants">مطاعم</option>
+                                <option value="technician" data-translate="tech_services">خدمات تقنية</option>
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label for="distance-slider">المسافة القصوى: <span id="distance-value">10</span> كم</label>
+                            <label for="distance-slider" data-translate="max_distance">المسافة القصوى:</label>
+                            <span id="distance-value">10</span>
+                            <span data-translate="km">كم</span>
                             <input type="range" id="distance-slider" min="1" max="50" value="10">
                         </div>
                         <button id="find-services-btn" class="btn primary">
-                            <i class="fas fa-search"></i> ابحث عن الخدمات القريبة
+                            <i class="fas fa-search"></i>
+                            <span data-translate="find_nearby_services">ابحث عن الخدمات القريبة</span>
                         </button>
                     </div>
 
                     <div class="instructions card">
-                        <h3><i class="fas fa-info-circle"></i> كيفية الاستخدام</h3>
+                        <h3><i class="fas fa-info-circle"></i> <span data-translate="how_to_use">كيفية الاستخدام</span></h3>
                         <ol>
-                            <li>اسمح بالوصول إلى موقعك أو أدخل الإحداثيات</li>
-                            <li>اختر نوع الخدمة المطلوبة</li>
-                            <li>حدد المسافة القصوى</li>
-                            <li>اضغط على "ابحث عن الخدمات القريبة"</li>
-                            <li>شاهد النتائج على الخريطة والقائمة</li>
+                            <li data-translate="step_1">اسمح بالوصول إلى موقعك أو أدخل الإحداثيات</li>
+                            <li data-translate="step_2">اختر نوع الخدمة المطلوبة</li>
+                            <li data-translate="step_3">حدد المسافة القصوى</li>
+                            <li data-translate="step_4">اضغط على "ابحث عن الخدمات القريبة"</li>
+                            <li data-translate="step_5">شاهد النتائج على الخريطة والقائمة</li>
                         </ol>
                     </div>
                 </div>
@@ -89,36 +110,39 @@
                 <div class="right-panel">
                     <div class="results-section card">
                         <div class="results-header">
-                            <h2><i class="fas fa-list"></i> الخدمات القريبة</h2>
-                            <div id="results-count">0 خدمات وجدت</div>
+                            <h2><i class="fas fa-list"></i> <span data-translate="nearby_services">الخدمات القريبة</span></h2>
+                            <div id="results-count">
+                                <span>0</span>
+                                <span data-translate="services_found"> خدمات وجدت</span>
+                            </div>
                         </div>
                         <div id="results-container">
                             <div class="empty-state">
                                 <i class="fas fa-search-location fa-3x"></i>
-                                <p>ستظهر نتائج البحث هنا</p>
+                                <p data-translate="results_will_appear">ستظهر نتائج البحث هنا</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="map-section card">
-                        <h2><i class="fas fa-map"></i> الخريطة</h2>
+                        <h2><i class="fas fa-map"></i> <span data-translate="map">الخريطة</span></h2>
                         <div id="map-container">
                             <div id="map">
                                 <!-- Map will be loaded here -->
                             </div>
                             <div id="map-controls">
-                                <button id="zoom-in" class="map-btn"><i class="fas fa-plus"></i></button>
-                                <button id="zoom-out" class="map-btn"><i class="fas fa-minus"></i></button>
-                                <button id="locate-me" class="map-btn"><i class="fas fa-location-arrow"></i></button>
-                                <button id="reset-view" class="map-btn"><i class="fas fa-home"></i></button>
+                                <button id="zoom-in" class="map-btn" title="Zoom In"><i class="fas fa-plus"></i></button>
+                                <button id="zoom-out" class="map-btn" title="Zoom Out"><i class="fas fa-minus"></i></button>
+                                <button id="locate-me" class="map-btn" title="Locate Me"><i class="fas fa-location-arrow"></i></button>
+                                <button id="reset-view" class="map-btn" title="Reset View"><i class="fas fa-home"></i></button>
                             </div>
                             <div id="map-legend">
-                                <div class="legend-item"><span class="legend-color transporter"></span> خدمات النقل</div>
-                                <div class="legend-item"><span class="legend-color doctor"></span> أطباء</div>
-                                <div class="legend-item"><span class="legend-color pharmacy"></span> صيدليات</div>
-                                <div class="legend-item"><span class="legend-color mechanic"></span> ميكانيكي</div>
-                                <div class="legend-item"><span class="legend-color restaurant"></span> مطاعم</div>
-                                <div class="legend-item"><span class="legend-color technician"></span> خدمات تقنية</div>
+                                <div class="legend-item"><span class="legend-color transporter"></span> <span data-translate="transport_services">خدمات النقل</span></div>
+                                <div class="legend-item"><span class="legend-color doctor"></span> <span data-translate="doctors">أطباء</span></div>
+                                <div class="legend-item"><span class="legend-color pharmacy"></span> <span data-translate="pharmacies">صيدليات</span></div>
+                                <div class="legend-item"><span class="legend-color mechanic"></span> <span data-translate="mechanics">ميكانيكي</span></div>
+                                <div class="legend-item"><span class="legend-color restaurant"></span> <span data-translate="restaurants">مطاعم</span></div>
+                                <div class="legend-item"><span class="legend-color technician"></span> <span data-translate="tech_services">خدمات تقنية</span></div>
                             </div>
                         </div>
                     </div>
@@ -127,7 +151,7 @@
         </main>
 
         <footer>
-            <p>خدمات قريبة - تونس &copy; 2023 | مبرمج بـ Flask و JavaScript</p>
+            <p data-translate="copyright">خدمات قريبة - تونس &copy; 2023 | مبرمج بـ Flask و JavaScript</p>
         </footer>
     </div>
 
@@ -148,5 +172,6 @@
     <!-- Leaflet Awesome Markers -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.min.js"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
 </body>
 </html>

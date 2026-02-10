@@ -1,4 +1,4 @@
-// Main Application
+// Main Application with Translation Support
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
     const getLocationBtn = document.getElementById('get-location-btn');
@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize App
     initApp();
+    
+    // Initialize Translations
+    initTranslations();
     
     function initMap() {
         // Initialize Leaflet map centered on Tunisia
@@ -75,15 +78,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         userMarker = L.marker([userLocation.lat, userLocation.lon], {
             icon: userIcon,
-            title: 'موقعك'
+            title: t('your_location', 'Your Location')
         }).addTo(map);
         
         // Add popup to user marker
         userMarker.bindPopup(`
             <div style="text-align: center;">
-                <h3>موقعك</h3>
-                <p>خط العرض: ${userLocation.lat.toFixed(6)}</p>
-                <p>خط الطول: ${userLocation.lon.toFixed(6)}</p>
+                <h3>${t('your_location', 'Your Location')}</h3>
+                <p>${t('latitude', 'Latitude')}: ${userLocation.lat.toFixed(6)}</p>
+                <p>${t('longitude', 'Longitude')}: ${userLocation.lon.toFixed(6)}</p>
             </div>
         `);
     }
@@ -125,6 +128,69 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Center map on default location
         map.setView([userLocation.lat, userLocation.lon], 12);
+        
+        // Update input placeholders based on language
+        updateInputPlaceholders();
+    }
+    
+    function initTranslations() {
+        // Update map control titles when language changes
+        updateMapControlTitles();
+        
+        // Listen for language changes
+        document.addEventListener('languageChanged', () => {
+            updateMapControlTitles();
+            updateInputPlaceholders();
+            updateEmptyStateMessages();
+            updateResultsCount();
+            updateUserMarkerPopup();
+        });
+    }
+    
+    function updateMapControlTitles() {
+        if (zoomInBtn) zoomInBtn.title = t('zoom_in', 'Zoom In');
+        if (zoomOutBtn) zoomOutBtn.title = t('zoom_out', 'Zoom Out');
+        if (locateMeBtn) locateMeBtn.title = t('locate_me', 'Locate Me');
+        if (resetViewBtn) resetViewBtn.title = t('reset_view', 'Reset View');
+    }
+    
+    function updateInputPlaceholders() {
+        // Update input placeholders based on current language
+        const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
+        
+        if (lang === 'ar') {
+            latitudeInput.placeholder = 'مثال: 36.8065';
+            longitudeInput.placeholder = 'مثال: 10.1815';
+        } else if (lang === 'fr') {
+            latitudeInput.placeholder = 'Exemple: 36.8065';
+            longitudeInput.placeholder = 'Exemple: 10.1815';
+        } else {
+            latitudeInput.placeholder = 'Example: 36.8065';
+            longitudeInput.placeholder = 'Example: 10.1815';
+        }
+    }
+    
+    function updateEmptyStateMessages() {
+        // Update empty state messages in results container
+        const emptyState = resultsContainer.querySelector('.empty-state');
+        if (emptyState && emptyState.querySelector('p')) {
+            const p = emptyState.querySelector('p');
+            if (p.getAttribute('data-translate') === 'results_will_appear') {
+                p.textContent = t('results_will_appear', 'Search results will appear here');
+            }
+        }
+    }
+    
+    function updateUserMarkerPopup() {
+        if (userMarker) {
+            userMarker.getPopup().setContent(`
+                <div style="text-align: center;">
+                    <h3>${t('your_location', 'Your Location')}</h3>
+                    <p>${t('latitude', 'Latitude')}: ${userLocation.lat.toFixed(6)}</p>
+                    <p>${t('longitude', 'Longitude')}: ${userLocation.lon.toFixed(6)}</p>
+                </div>
+            `);
+        }
     }
     
     function updateDistanceValue() {
@@ -133,11 +199,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function getUserLocation() {
         if (!navigator.geolocation) {
-            showMessage('المتصفح لا يدعم تحديد الموقع', 'error');
+            showMessage('browser_no_geolocation', 'error');
             return;
         }
         
-        getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحديد الموقع...';
+        getLocationBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t('getting_location', 'Getting location...')}`;
         getLocationBtn.disabled = true;
         
         navigator.geolocation.getCurrentPosition(
@@ -149,8 +215,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 latitudeInput.value = userLocation.lat.toFixed(6);
                 longitudeInput.value = userLocation.lon.toFixed(6);
                 
-                showMessage('تم تحديد موقعك بنجاح!', 'success');
-                getLocationBtn.innerHTML = '<i class="fas fa-location-crosshairs"></i> استخدام موقعي';
+                showMessage('location_success', 'success');
+                getLocationBtn.innerHTML = `<i class="fas fa-location-crosshairs"></i> ${t('use_my_location', 'Use My Location')}`;
                 getLocationBtn.disabled = false;
                 
                 // Update user marker on map
@@ -161,23 +227,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 findServices();
             },
             (error) => {
-                let errorMessage = 'تعذر تحديد موقعك. ';
+                let errorKey = 'location_error';
+                let errorMessage = t('location_error', 'Unable to determine your location. ');
+                
                 switch(error.code) {
                     case error.PERMISSION_DENIED:
-                        errorMessage += 'تم رفض الإذن.';
+                        errorMessage += t('permission_denied', 'Permission denied.');
+                        errorKey = 'permission_denied';
                         break;
                     case error.POSITION_UNAVAILABLE:
-                        errorMessage += 'الموقع غير متوفر.';
+                        errorMessage += t('position_unavailable', 'Position unavailable.');
+                        errorKey = 'position_unavailable';
                         break;
                     case error.TIMEOUT:
-                        errorMessage += 'انتهت مهلة الطلب.';
+                        errorMessage += t('timeout', 'Request timeout.');
+                        errorKey = 'timeout';
                         break;
                     default:
-                        errorMessage += 'خطأ غير معروف.';
+                        errorMessage += t('unknown_error', 'Unknown error.');
+                        errorKey = 'unknown_error';
                 }
                 
-                showMessage(errorMessage, 'error');
-                getLocationBtn.innerHTML = '<i class="fas fa-location-crosshairs"></i> استخدام موقعي';
+                showMessage(errorKey, 'error');
+                getLocationBtn.innerHTML = `<i class="fas fa-location-crosshairs"></i> ${t('use_my_location', 'Use My Location')}`;
                 getLocationBtn.disabled = false;
             }
         );
@@ -191,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
         latitudeInput.value = userLocation.lat;
         longitudeInput.value = userLocation.lon;
         
-        showMessage('تم استخدام تونس كموقع افتراضي', 'info');
+        showMessage('using_default_location', 'info');
         
         // Update user marker
         updateUserMarker();
@@ -207,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const lon = parseFloat(longitudeInput.value);
         
         if (isNaN(lat) || isNaN(lon)) {
-            showMessage('الرجاء إدخال إحداثيات صحيحة', 'error');
+            showMessage('invalid_coordinates', 'error');
             return;
         }
         
@@ -218,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const maxDistance = distanceSlider.value;
         
         // Show loading state
-        findServicesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري البحث...';
+        findServicesBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t('searching', 'Searching...')}`;
         findServicesBtn.disabled = true;
         
         // Update user marker position
@@ -232,32 +304,48 @@ document.addEventListener('DOMContentLoaded', function() {
                     currentServices = data.services;
                     displayServices(currentServices);
                     displayServicesOnMap(currentServices);
-                    resultsCount.textContent = `${currentServices.length} خدمات وجدت`;
+                    updateResultsCount();
                     
                     // Zoom to fit all markers if we have services
                     if (currentServices.length > 0) {
                         zoomToFitMarkers();
                     }
                 } else {
-                    showMessage('خطأ: ' + data.error, 'error');
-                    resultsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle fa-3x"></i><p>لم يتم العثور على خدمات. حاول تعديل بحثك.</p></div>';
-                    resultsCount.textContent = '0 خدمات وجدت';
+                    showMessage('search_error', 'error');
+                    resultsContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-circle fa-3x"></i>
+                            <p>${t('no_services_found', 'No services found. Try adjusting your search.')}</p>
+                        </div>`;
                     clearServiceMarkers();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showMessage('فشل في جلب الخدمات. الرجاء المحاولة مرة أخرى.', 'error');
+                showMessage('fetch_error', 'error');
             })
             .finally(() => {
-                findServicesBtn.innerHTML = '<i class="fas fa-search"></i> ابحث عن الخدمات القريبة';
+                findServicesBtn.innerHTML = `<i class="fas fa-search"></i> ${t('find_nearby_services', 'Find Nearby Services')}`;
                 findServicesBtn.disabled = false;
             });
     }
     
+    function updateResultsCount() {
+        const count = currentServices.length;
+        const countSpan = resultsCount.querySelector('span:first-child');
+        const textSpan = resultsCount.querySelector('span:last-child');
+        
+        if (countSpan) countSpan.textContent = count;
+        if (textSpan) textSpan.textContent = ` ${t('services_found', 'services found')}`;
+    }
+    
     function displayServices(services) {
         if (services.length === 0) {
-            resultsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-map-marker-slash fa-3x"></i><p>لم يتم العثور على خدمات ضمن المسافة المحددة. حاول زيادة دائرة البحث.</p></div>';
+            resultsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-map-marker-slash fa-3x"></i>
+                    <p>${t('no_services_in_range', 'No services found within the specified distance. Try increasing the search radius.')}</p>
+                </div>`;
             return;
         }
         
@@ -274,43 +362,43 @@ document.addEventListener('DOMContentLoaded', function() {
         card.className = `service-card ${service.category}`;
         card.dataset.id = service.id;
         
-        // Get category display name
+        // Get category display name based on language
         const categoryNames = {
-            'transporter': 'خدمة نقل',
-            'doctor': 'خدمة طبية',
-            'pharmacy': 'صيدلية',
-            'mechanic': 'تصليح سيارات',
-            'restaurant': 'مطعم',
-            'technician': 'خدمة تقنية'
+            'transporter': t('transport_services', 'Transport Service'),
+            'doctor': t('medical_services', 'Medical Service'),
+            'pharmacy': t('pharmacies', 'Pharmacy'),
+            'mechanic': t('car_repair', 'Car Repair'),
+            'restaurant': t('restaurants', 'Restaurant'),
+            'technician': t('tech_services', 'Technical Service')
         };
         
-        const categoryName = categoryNames[service.category] || 'خدمة';
+        const categoryName = categoryNames[service.category] || t('service', 'Service');
         
         // Get subcategory display name
         const subcategoryNames = {
-            'taxi': 'تاكسي',
-            'delivery': 'توصيل',
-            'moving': 'نقل عفش',
-            'ride_sharing': 'نقل مشترك',
-            'general': 'طبيب عام',
-            'dentist': 'طبيب أسنان',
-            'pediatrician': 'طبيب أطفال',
-            'cardiologist': 'طبيب قلب',
-            'drugstore': 'صيدلية',
-            'auto': 'تصليح سيارات',
-            'dining': 'مطعم',
-            'computer': 'تصليح حواسيب'
+            'taxi': t('taxi', 'Taxi'),
+            'delivery': t('delivery', 'Delivery'),
+            'moving': t('moving', 'Moving'),
+            'ride_sharing': t('ride_sharing', 'Ride Sharing'),
+            'general': t('general_doctor', 'General Doctor'),
+            'dentist': t('dentist', 'Dentist'),
+            'pediatrician': t('pediatrician', 'Pediatrician'),
+            'cardiologist': t('cardiologist', 'Cardiologist'),
+            'drugstore': t('drugstore', 'Drugstore'),
+            'auto': t('auto_repair', 'Auto Repair'),
+            'dining': t('dining', 'Dining'),
+            'computer': t('computer_repair', 'Computer Repair')
         };
         
         const subcategoryName = subcategoryNames[service.subcategory] || service.subcategory;
         
         // Format phone number
-        const phoneFormatted = service.phone.replace(/(\+\d{1,3})(\d{2})(\d{3})(\d{3})/, '$1 $2 $3 $4');
+        const phoneFormatted = formatPhoneNumber(service.phone);
         
         card.innerHTML = `
             <div class="service-header">
                 <div class="service-name">${service.name}</div>
-                <div class="service-distance">${service.distance} كم</div>
+                <div class="service-distance">${service.distance} ${t('km', 'km')}</div>
             </div>
             <div class="service-category">${categoryName} - ${subcategoryName}</div>
             <div class="service-address">
@@ -333,6 +421,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         return card;
+    }
+    
+    function formatPhoneNumber(phone) {
+        // Format phone number based on language direction
+        const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
+        
+        if (lang === 'ar') {
+            // RTL format
+            return phone.replace(/(\+\d{1,3})(\d{2})(\d{3})(\d{3})/, '$1 $2 $3 $4');
+        } else {
+            // LTR format
+            return phone.replace(/(\+\d{1,3})(\d{2})(\d{3})(\d{3})/, '$1 $2 $3 $4');
+        }
     }
     
     function displayServicesOnMap(services) {
@@ -380,19 +481,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 title: service.name
             }).addTo(map);
             
-            // Create popup content
+            // Create popup content with proper text direction
+            const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
+            const textDirection = lang === 'ar' ? 'rtl' : 'ltr';
+            const textAlign = lang === 'ar' ? 'right' : 'left';
+            
             const popupContent = `
-                <div style="text-align: right; direction: rtl;">
+                <div style="text-align: ${textAlign}; direction: ${textDirection}">
                     <h3 style="margin: 0 0 10px 0; color: #2c3e50;">${service.name}</h3>
                     <div class="popup-distance" style="background: #3498db; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; display: inline-block; margin-bottom: 10px;">
-                        ${service.distance} كم
+                        ${service.distance} ${t('km', 'km')}
                     </div>
-                    <p style="margin: 5px 0;"><strong>العنوان:</strong> ${service.address}</p>
-                    <p style="margin: 5px 0;"><strong>الهاتف:</strong> <span class="popup-phone">${service.phone}</span></p>
-                    <p style="margin: 5px 0;"><strong>التقييم:</strong> ${service.rating}/5</p>
+                    <p style="margin: 5px 0;"><strong>${t('address', 'Address')}:</strong> ${service.address}</p>
+                    <p style="margin: 5px 0;"><strong>${t('phone', 'Phone')}:</strong> <span class="popup-phone">${service.phone}</span></p>
+                    <p style="margin: 5px 0;"><strong>${t('rating', 'Rating')}:</strong> ${service.rating}/5</p>
                     <p style="margin: 10px 0 0 0; font-size: 0.9rem; color: #7f8c8d;">${service.description}</p>
-                    <button onclick="showServiceDetailsModal(${service.id})" style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-top: 10px; cursor: pointer; width: 100%;">
-                        <i class="fas fa-info-circle"></i> المزيد من التفاصيل
+                    <button onclick="showServiceDetailsFromMap(${service.id})" style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-top: 10px; cursor: pointer; width: 100%;">
+                        <i class="fas fa-info-circle"></i> ${t('more_details', 'More Details')}
                     </button>
                 </div>
             `;
@@ -471,36 +576,44 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Get category display name
         const categoryNames = {
-            'transporter': 'خدمة نقل',
-            'doctor': 'خدمة طبية',
-            'pharmacy': 'صيدلية',
-            'mechanic': 'تصليح سيارات',
-            'restaurant': 'مطعم',
-            'technician': 'خدمة تقنية'
+            'transporter': t('transport_services', 'Transport Service'),
+            'doctor': t('medical_services', 'Medical Service'),
+            'pharmacy': t('pharmacies', 'Pharmacy'),
+            'mechanic': t('car_repair', 'Car Repair'),
+            'restaurant': t('restaurants', 'Restaurant'),
+            'technician': t('tech_services', 'Technical Service')
         };
         
-        const categoryName = categoryNames[service.category] || 'خدمة';
+        const categoryName = categoryNames[service.category] || t('service', 'Service');
         
         // Get subcategory display name
         const subcategoryNames = {
-            'taxi': 'تاكسي',
-            'delivery': 'توصيل',
-            'moving': 'نقل عفش',
-            'ride_sharing': 'نقل مشترك',
-            'general': 'طبيب عام',
-            'dentist': 'طبيب أسنان',
-            'pediatrician': 'طبيب أطفال',
-            'cardiologist': 'طبيب قلب',
-            'drugstore': 'صيدلية',
-            'auto': 'تصليح سيارات',
-            'dining': 'مطعم',
-            'computer': 'تصليح حواسيب'
+            'taxi': t('taxi', 'Taxi'),
+            'delivery': t('delivery', 'Delivery'),
+            'moving': t('moving', 'Moving'),
+            'ride_sharing': t('ride_sharing', 'Ride Sharing'),
+            'general': t('general_doctor', 'General Doctor'),
+            'dentist': t('dentist', 'Dentist'),
+            'pediatrician': t('pediatrician', 'Pediatrician'),
+            'cardiologist': t('cardiologist', 'Cardiologist'),
+            'drugstore': t('drugstore', 'Drugstore'),
+            'auto': t('auto_repair', 'Auto Repair'),
+            'dining': t('dining', 'Dining'),
+            'computer': t('computer_repair', 'Computer Repair')
         };
         
         const subcategoryName = subcategoryNames[service.subcategory] || service.subcategory;
         
         // Format phone number
-        const phoneFormatted = service.phone.replace(/(\+\d{1,3})(\d{2})(\d{3})(\d{3})/, '$1 $2 $3 $4');
+        const phoneFormatted = formatPhoneNumber(service.phone);
+        
+        // Set modal direction based on language
+        const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
+        const modalDirection = lang === 'ar' ? 'rtl' : 'ltr';
+        const modalTextAlign = lang === 'ar' ? 'right' : 'left';
+        
+        modalBody.setAttribute('dir', modalDirection);
+        modalBody.style.textAlign = modalTextAlign;
         
         modalBody.innerHTML = `
             <h2 class="modal-service-name">${service.name}</h2>
@@ -509,51 +622,51 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="modal-detail">
                 <i class="fas fa-map-marker-alt"></i>
                 <div>
-                    <strong>العنوان:</strong> ${service.address}
+                    <strong>${t('address', 'Address')}:</strong> ${service.address}
                 </div>
             </div>
             
             <div class="modal-detail">
                 <i class="fas fa-phone"></i>
                 <div>
-                    <strong>الهاتف:</strong> ${phoneFormatted}
+                    <strong>${t('phone', 'Phone')}:</strong> ${phoneFormatted}
                 </div>
             </div>
             
             <div class="modal-detail">
                 <i class="fas fa-ruler"></i>
                 <div>
-                    <strong>المسافة:</strong> ${service.distance} كم من موقعك
+                    <strong>${t('distance', 'Distance')}:</strong> ${service.distance} ${t('km_from_you', 'km from you')}
                 </div>
             </div>
             
             <div class="modal-detail">
                 <i class="fas fa-star"></i>
                 <div>
-                    <strong>التقييم:</strong> ${service.rating}/5
+                    <strong>${t('rating', 'Rating')}:</strong> ${service.rating}/5
                 </div>
             </div>
             
             <div class="modal-detail">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>الوصف:</strong> ${service.description}
+                    <strong>${t('description', 'Description')}:</strong> ${service.description}
                 </div>
             </div>
             
             <div class="modal-detail">
                 <i class="fas fa-map"></i>
                 <div>
-                    <strong>الإحداثيات:</strong> ${service.latitude.toFixed(6)}, ${service.longitude.toFixed(6)}
+                    <strong>${t('coordinates', 'Coordinates')}:</strong> ${service.latitude.toFixed(6)}, ${service.longitude.toFixed(6)}
                 </div>
             </div>
             
             <div style="margin-top: 20px; text-align: center;">
                 <button onclick="centerOnServiceOnMap(${service.id})" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">
-                    <i class="fas fa-map-marker-alt"></i> عرض على الخريطة
+                    <i class="fas fa-map-marker-alt"></i> ${t('view_on_map', 'View on Map')}
                 </button>
                 <button onclick="showRouteToService(${service.id})" style="background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 5px; cursor: pointer;">
-                    <i class="fas fa-route"></i> عرض المسار
+                    <i class="fas fa-route"></i> ${t('show_route', 'Show Route')}
                 </button>
             </div>
         `;
@@ -575,9 +688,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.open(`https://www.google.com/maps/dir/${origin}/${destination}`, '_blank');
             }
         };
+        
+        // Also add the function called from map popups
+        window.showServiceDetailsFromMap = function(serviceId) {
+            const service = currentServices.find(s => s.id === serviceId);
+            if (service) {
+                showServiceDetails(service);
+            }
+        };
     }
     
-    function showMessage(message, type) {
+    function showMessage(messageKey, type) {
+        // Get translated message
+        let message = t(messageKey, messageKey);
+        
+        // If it's still a key (not found), use default messages
+        if (message === messageKey) {
+            switch(messageKey) {
+                case 'location_success':
+                    message = t('location_success', 'Your location has been determined successfully!');
+                    break;
+                case 'using_default_location':
+                    message = t('using_default_location', 'Using default Tunisia location');
+                    break;
+                case 'invalid_coordinates':
+                    message = t('invalid_coordinates', 'Please enter valid coordinates');
+                    break;
+                case 'browser_no_geolocation':
+                    message = t('browser_no_geolocation', 'Browser does not support geolocation');
+                    break;
+                case 'location_error':
+                    message = t('location_error', 'Unable to determine your location');
+                    break;
+                case 'permission_denied':
+                    message = t('permission_denied', 'Permission denied');
+                    break;
+                case 'position_unavailable':
+                    message = t('position_unavailable', 'Position unavailable');
+                    break;
+                case 'timeout':
+                    message = t('timeout', 'Request timeout');
+                    break;
+                case 'unknown_error':
+                    message = t('unknown_error', 'Unknown error');
+                    break;
+                case 'search_error':
+                    message = t('search_error', 'Error searching for services');
+                    break;
+                case 'fetch_error':
+                    message = t('fetch_error', 'Failed to fetch services. Please try again.');
+                    break;
+                default:
+                    message = messageKey;
+            }
+        }
+        
         // Remove any existing message
         const existingMessage = document.querySelector('.message');
         if (existingMessage) {
@@ -605,6 +770,15 @@ document.addEventListener('DOMContentLoaded', function() {
             direction: 'rtl'
         };
         
+        // Adjust position based on language
+        const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
+        if (lang !== 'ar') {
+            styles.right = 'auto';
+            styles.left = '20px';
+            styles.textAlign = 'left';
+            styles.direction = 'ltr';
+        }
+        
         if (type === 'success') {
             styles.backgroundColor = '#2ecc71';
         } else if (type === 'error') {
@@ -624,5 +798,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageEl.parentNode.removeChild(messageEl);
             }
         }, 5000);
+    }
+    
+    // Helper function to get translation
+    function t(key, defaultValue = '') {
+        if (window.translator && typeof window.translator.translate === 'function') {
+            return window.translator.translate(key, defaultValue);
+        }
+        return defaultValue || key;
+    }
+    
+    // Make t function available globally
+    window.t = t;
+    
+    // Dispatch language change event when translator changes language
+    if (window.translator && window.translator.changeLanguage) {
+        const originalChangeLanguage = window.translator.changeLanguage;
+        window.translator.changeLanguage = function(lang) {
+            originalChangeLanguage.call(this, lang);
+            document.dispatchEvent(new CustomEvent('languageChanged', { 
+                detail: { language: lang } 
+            }));
+        };
     }
 });
