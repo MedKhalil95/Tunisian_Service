@@ -336,6 +336,32 @@ SERVICES = [
         "rating": 4.3,
         "description": "Full auto repair and maintenance",
         "distance": None
+    },
+    {
+        "id": 25,
+        "name": "Abbassi Alaa",
+        "category": "technician",
+        "subcategory": "Maintenance, Installation, Réparation",
+        "latitude": 36.7808730,
+        "longitude": 10.2249821,
+        "address": "Hay chaker, Mégrine, Ben Arous",
+        "phone": "+216-23-558-959",
+        "rating": 4.4,
+        "description": "Chef de projet",
+        "distance": None
+    },
+    {
+        "id": 26,
+        "name": "Hafedh Kallel",
+        "category": "restaurant",
+        "subcategory": "Pizza, Burger, Baguettes Farcies,Makloub",
+        "latitude": 36.8990831,
+        "longitude": 10.1840318,
+        "address": "Ariana Soghra, Ariana",
+        "phone": "+216-50-070-999",
+        "rating": 4.4,
+        "description": "Chef de projet",
+        "distance": None
     }
 ]
 

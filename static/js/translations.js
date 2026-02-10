@@ -53,12 +53,12 @@ class TranslationSystem {
                 'copyright': 'خدمات قريبة - تونس © 2023 | مبرمج بـ Flask و JavaScript',
                 
                 // Modal
-                'address': 'العنوان:',
-                'phone': 'الهاتف:',
-                'distance': 'المسافة:',
-                'rating': 'التقييم:',
-                'description': 'الوصف:',
-                'coordinates': 'الإحداثيات:',
+                'address': 'العنوان',
+                'phone': 'الهاتف',
+                'distance': 'المسافة',
+                'rating': 'التقييم',
+                'description': 'الوصف',
+                'coordinates': 'الإحداثيات',
                 'view_on_map': 'عرض على الخريطة',
                 'show_route': 'عرض المسار',
                 
@@ -124,12 +124,12 @@ class TranslationSystem {
                 'copyright': 'Nearby Services - Tunisia © 2023 | Built with Flask and JavaScript',
                 
                 // Modal
-                'address': 'Address:',
-                'phone': 'Phone:',
-                'distance': 'Distance:',
-                'rating': 'Rating:',
-                'description': 'Description:',
-                'coordinates': 'Coordinates:',
+                'address': 'Address',
+                'phone': 'Phone',
+                'distance': 'Distance',
+                'rating': 'Rating',
+                'description': 'Description',
+                'coordinates': 'Coordinates',
                 'view_on_map': 'View on Map',
                 'show_route': 'Show Route',
                 
@@ -195,12 +195,12 @@ class TranslationSystem {
                 'copyright': 'Services à Proximité - Tunisie © 2023 | Développé avec Flask et JavaScript',
                 
                 // Modal
-                'address': 'Adresse:',
-                'phone': 'Téléphone:',
-                'distance': 'Distance:',
-                'rating': 'Évaluation:',
-                'description': 'Description:',
-                'coordinates': 'Coordonnées:',
+                'address': 'Adresse',
+                'phone': 'Téléphone',
+                'distance': 'Distance',
+                'rating': 'Évaluation',
+                'description': 'Description',
+                'coordinates': 'Coordonnées',
                 'view_on_map': 'Voir sur la Carte',
                 'show_route': 'Afficher l\'Itinéraire',
                 
