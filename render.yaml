@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: nearby-services-tunisia
+    env: python
+    region: frankfurt  # or singapore, ohio, oregon - choose closest to Tunisia
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    healthCheckPath: /
+    autoDeploy: true
+    plan: free  # or starter, standard, etc.
