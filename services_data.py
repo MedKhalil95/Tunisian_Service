@@ -352,9 +352,9 @@ SERVICES = [
     },
     {
         "id": 26,
-        "name": "Hafedh Kallel",
+        "name": "Hafood",
         "category": "restaurant",
-        "subcategory": "Pizza, Burger, Baguettes Farcies,Makloub",
+        "subcategory": "Pizza, Burger, Baguettes Farcies, Makloub, Cornet",
         "latitude": 36.8990831,
         "longitude": 10.1840318,
         "address": "Ariana Soghra, Ariana",
@@ -362,7 +362,34 @@ SERVICES = [
         "rating": 4.4,
         "description": "Chef de projet",
         "distance": None
-    }
+    },
+    {
+        "id": 27,
+        "name": "Dali Food",
+        "category": "restaurant",
+        "subcategory": "Pizza, Burger, Baguettes Farcies, Makloub, Cornet",
+        "latitude": 36.9099302,
+        "longitude": 10.1865001,
+        "address": "Nour Jaafer, Ariana",
+        "phone": "+216-54-608-023",
+        "rating": 4.4,
+        "description": "Chef de projet",
+        "distance": None
+    },
+        {
+            "id": 28,
+            "name": "Meher Food",
+            "category": "restaurant",
+            "subcategory": "Tabouna, Souflet, Complet, Pizza",
+            "latitude": 36.9133988,
+            "longitude": 10.1868917,
+            "address": "Nour Jaafer, Ariana",
+            "phone": "+216-21-496-002",
+            "rating": 4.2,
+            "description": "Chef de projet",
+            "distance": None
+        }
+
 ]
 
 # Categories for UI dropdown
