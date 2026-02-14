@@ -11,8 +11,8 @@ class TranslationSystem {
                 // Location section
                 'location': 'موقعك',
                 'location_instruction': 'اضغط على الزر لاستخدام موقعك أو أدخل الإحداثيات يدوياً.',
-                'latitude': 'خط العرض:',
-                'longitude': 'خط الطول:',
+                'latitude': 'خط العرض',
+                'longitude': 'خط الطول',
                 'use_my_location': 'استخدام موقعي',
                 'use_tunisia': 'استخدام تونس',
                 
@@ -72,7 +72,11 @@ class TranslationSystem {
                 'zoom_in': 'تكبير',
                 'zoom_out': 'تصغير',
                 'locate_me': 'تحديد موقعي',
-                'reset_view': 'عرض افتراضي'
+                'reset_view': 'عرض افتراضي',
+                "search_city": "ابحث عن مدينة في تونس",
+                "apply_coordinates": "تطبيق الإحداثيات",
+                "city_selected": "تم اختيار: ",
+                "location_updated": "تم تحديث الموقع من الإحداثيات المدخلة"
             },
             'en': {
                 // Header
@@ -82,14 +86,14 @@ class TranslationSystem {
                 // Location section
                 'location': 'Your Location',
                 'location_instruction': 'Click the button to use your location or enter coordinates manually.',
-                'latitude': 'Latitude:',
-                'longitude': 'Longitude:',
+                'latitude': 'Latitude',
+                'longitude': 'Longitude',
                 'use_my_location': 'Use My Location',
                 'use_tunisia': 'Use Tunisia',
                 
                 // Filters section
                 'filters': 'Filters',
-                'service_type': 'Service Type:',
+                'service_type': 'Service Type',
                 'all_services': 'All Services',
                 'transport_services': 'Transport Services',
                 'medical_services': 'Doctors & Medical',
@@ -143,7 +147,12 @@ class TranslationSystem {
                 'zoom_in': 'Zoom In',
                 'zoom_out': 'Zoom Out',
                 'locate_me': 'Locate Me',
-                'reset_view': 'Reset View'
+                'reset_view': 'Reset View',
+                "search_city": "Search for a city in Tunisia",
+                "apply_coordinates": "Apply Coordinates",
+                "city_selected": "Selected: ",
+                "location_updated": "Location updated from entered coordinates"
+        
             },
             'fr': {
                 // Header
@@ -153,8 +162,8 @@ class TranslationSystem {
                 // Location section
                 'location': 'Votre Emplacement',
                 'location_instruction': 'Cliquez sur le bouton pour utiliser votre emplacement ou entrez les coordonnées manuellement.',
-                'latitude': 'Latitude:',
-                'longitude': 'Longitude:',
+                'latitude': 'Latitude',
+                'longitude': 'Longitude',
                 'use_my_location': 'Utiliser Ma Position',
                 'use_tunisia': 'Utiliser Tunisie',
                 
@@ -214,7 +223,11 @@ class TranslationSystem {
                 'zoom_in': 'Zoomer',
                 'zoom_out': 'Dézoomer',
                 'locate_me': 'Me Localiser',
-                'reset_view': 'Vue par Défaut'
+                'reset_view': 'Vue par Défaut',
+                "search_city": "Rechercher une ville en Tunisie",
+                "apply_coordinates": "Appliquer les Coordonnées",
+                "city_selected": "Sélectionné  ",
+                "location_updated": "Emplacement mis à jour à partir des coordonnées saisies"
             }
         };
         

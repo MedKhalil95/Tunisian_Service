@@ -30,6 +30,27 @@ document.addEventListener('DOMContentLoaded', function() {
     let map = null;
     let userMarker = null;
     let serviceMarkers = [];
+    let userMarkerCircle = null; // For showing search radius
+    
+    // Tunisian Cities data from services_data.py
+    const TUNISIAN_CITIES = {
+        "Tunis": {lat: 36.8065, lon: 10.1815},
+        "Sousse": {lat: 35.8288, lon: 10.6405},
+        "Sfax": {lat: 34.7406, lon: 10.7603},
+        "Nabeul": {lat: 36.4561, lon: 10.7376},
+        "Hammamet": {lat: 36.4000, lon: 10.6167},
+        "Monastir": {lat: 35.7580, lon: 10.7544},
+        "Bizerte": {lat: 37.2742, lon: 9.8739},
+        "Ariana": {lat: 36.8625, lon: 10.1956},
+        "Ben Arous": {lat: 36.7545, lon: 10.2217},
+        "La Marsa": {lat: 36.8762, lon: 10.3243},
+        "Megrine": {lat: 36.7809, lon: 10.2250},
+        "El Manar": {lat: 36.8526, lon: 10.2012},
+        "La Soukra": {lat: 36.8894, lon: 10.2401},
+        "Charguia": {lat: 36.8989, lon: 10.1895},
+        "El Ghazala": {lat: 36.8484, lon: 10.2214},
+        "Sidi Bou Said": {lat: 36.8683, lon: 10.3417}
+    };
     
     // Initialize Map
     initMap();
@@ -108,9 +129,14 @@ document.addEventListener('DOMContentLoaded', function() {
         useDefaultBtn.addEventListener('click', useDefaultLocation);
         findServicesBtn.addEventListener('click', findServices);
         distanceSlider.addEventListener('input', updateDistanceValue);
+        distanceSlider.addEventListener('change', showSearchRadius); // Update radius when slider changes
         closeModal.addEventListener('click', () => {
             serviceModal.style.display = 'none';
         });
+        
+        // Add input listeners for manual coordinate updates
+        latitudeInput.addEventListener('change', updateUserLocationFromInputs);
+        longitudeInput.addEventListener('change', updateUserLocationFromInputs);
         
         // Close modal when clicking outside
         window.addEventListener('click', (event) => {
@@ -118,6 +144,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 serviceModal.style.display = 'none';
             }
         });
+        
+        // Initialize city search
+        initCitySearch();
         
         // Set default location in inputs
         latitudeInput.value = userLocation.lat;
@@ -129,8 +158,109 @@ document.addEventListener('DOMContentLoaded', function() {
         // Center map on default location
         map.setView([userLocation.lat, userLocation.lon], 12);
         
+        // Show initial search radius
+        showSearchRadius();
+        
         // Update input placeholders based on language
         updateInputPlaceholders();
+    }
+    
+    function initCitySearch() {
+        const citySearch = document.getElementById('city-search');
+        const citySuggestions = document.getElementById('city-suggestions');
+        
+        if (!citySearch) return;
+        
+        citySearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            if (searchTerm.length < 2) {
+                citySuggestions.style.display = 'none';
+                return;
+            }
+            
+            // Filter cities from TUNISIAN_CITIES
+            const matches = [];
+            for (const [city, coords] of Object.entries(TUNISIAN_CITIES)) {
+                if (city.toLowerCase().includes(searchTerm)) {
+                    matches.push({ name: city, ...coords });
+                }
+            }
+            
+            if (matches.length > 0) {
+                displayCitySuggestions(matches);
+            } else {
+                citySuggestions.style.display = 'none';
+            }
+        });
+        
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!citySearch.contains(e.target) && !citySuggestions.contains(e.target)) {
+                citySuggestions.style.display = 'none';
+            }
+        });
+    }
+    
+    function displayCitySuggestions(cities) {
+        const citySuggestions = document.getElementById('city-suggestions');
+        citySuggestions.innerHTML = '';
+        
+        cities.forEach(city => {
+            const item = document.createElement('div');
+            item.className = 'suggestion-item';
+            item.innerHTML = `
+                <i class="fas fa-city"></i>
+                <span>${city.name}</span>
+                <small>${city.lat.toFixed(4)}, ${city.lon.toFixed(4)}</small>
+            `;
+            item.addEventListener('click', () => {
+                selectCity(city);
+            });
+            citySuggestions.appendChild(item);
+        });
+        
+        citySuggestions.style.display = 'block';
+    }
+    
+    function selectCity(city) {
+        // Update user location
+        userLocation.lat = city.lat;
+        userLocation.lon = city.lon;
+        
+        // Update input fields
+        latitudeInput.value = userLocation.lat.toFixed(6);
+        longitudeInput.value = userLocation.lon.toFixed(6);
+        document.getElementById('city-search').value = city.name;
+        
+        // Hide suggestions
+        document.getElementById('city-suggestions').style.display = 'none';
+        
+        // Update map
+        updateUserMarker();
+        map.setView([userLocation.lat, userLocation.lon], 13);
+        showSearchRadius();
+        
+        // Show success message
+        showMessage(t('city_selected', `Selected: ${city.name}`), 'success');
+        
+        // Auto-search for services
+        findServices();
+    }
+    
+    function updateUserLocationFromInputs() {
+        const lat = parseFloat(latitudeInput.value);
+        const lon = parseFloat(longitudeInput.value);
+        
+        if (!isNaN(lat) && !isNaN(lon)) {
+            userLocation.lat = lat;
+            userLocation.lon = lon;
+            updateUserMarker();
+            map.setView([userLocation.lat, userLocation.lon], 13);
+            showSearchRadius();
+            
+            // Clear city search input
+            document.getElementById('city-search').value = '';
+        }
     }
     
     function initTranslations() {
@@ -161,12 +291,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (lang === 'ar') {
             latitudeInput.placeholder = 'مثال: 36.8065';
             longitudeInput.placeholder = 'مثال: 10.1815';
+            document.getElementById('city-search').placeholder = 'ابحث عن مدينة في تونس...';
         } else if (lang === 'fr') {
             latitudeInput.placeholder = 'Exemple: 36.8065';
             longitudeInput.placeholder = 'Exemple: 10.1815';
+            document.getElementById('city-search').placeholder = 'Rechercher une ville en Tunisie...';
         } else {
             latitudeInput.placeholder = 'Example: 36.8065';
             longitudeInput.placeholder = 'Example: 10.1815';
+            document.getElementById('city-search').placeholder = 'Search for a city in Tunisia...';
         }
     }
     
@@ -197,6 +330,24 @@ document.addEventListener('DOMContentLoaded', function() {
         distanceValue.textContent = distanceSlider.value;
     }
     
+    function showSearchRadius() {
+        // Remove existing circle
+        if (userMarkerCircle) {
+            map.removeLayer(userMarkerCircle);
+        }
+        
+        // Create circle showing search radius
+        const radius = parseFloat(distanceSlider.value) * 1000; // Convert to meters
+        userMarkerCircle = L.circle([userLocation.lat, userLocation.lon], {
+            radius: radius,
+            color: '#3498db',
+            fillColor: '#3498db',
+            fillOpacity: 0.1,
+            weight: 2,
+            dashArray: '5, 5'
+        }).addTo(map);
+    }
+    
     function getUserLocation() {
         if (!navigator.geolocation) {
             showMessage('browser_no_geolocation', 'error');
@@ -215,6 +366,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 latitudeInput.value = userLocation.lat.toFixed(6);
                 longitudeInput.value = userLocation.lon.toFixed(6);
                 
+                // Clear city search
+                document.getElementById('city-search').value = '';
+                
                 showMessage('location_success', 'success');
                 getLocationBtn.innerHTML = `<i class="fas fa-location-crosshairs"></i> ${t('use_my_location', 'Use My Location')}`;
                 getLocationBtn.disabled = false;
@@ -222,55 +376,65 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update user marker on map
                 updateUserMarker();
                 centerMapOnUser();
+                showSearchRadius();
                 
                 // Auto-search for services
                 findServices();
             },
             (error) => {
-                let errorKey = 'location_error';
-                let errorMessage = t('location_error', 'Unable to determine your location. ');
-                
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMessage += t('permission_denied', 'Permission denied.');
-                        errorKey = 'permission_denied';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMessage += t('position_unavailable', 'Position unavailable.');
-                        errorKey = 'position_unavailable';
-                        break;
-                    case error.TIMEOUT:
-                        errorMessage += t('timeout', 'Request timeout.');
-                        errorKey = 'timeout';
-                        break;
-                    default:
-                        errorMessage += t('unknown_error', 'Unknown error.');
-                        errorKey = 'unknown_error';
-                }
-                
-                showMessage(errorKey, 'error');
+                handleLocationError(error);
                 getLocationBtn.innerHTML = `<i class="fas fa-location-crosshairs"></i> ${t('use_my_location', 'Use My Location')}`;
                 getLocationBtn.disabled = false;
             }
         );
     }
     
+    function handleLocationError(error) {
+        let errorKey = 'location_error';
+        let errorMessage = t('location_error', 'Unable to determine your location. ');
+        
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                errorMessage += t('permission_denied', 'Permission denied.');
+                errorKey = 'permission_denied';
+                break;
+            case error.POSITION_UNAVAILABLE:
+                errorMessage += t('position_unavailable', 'Position unavailable.');
+                errorKey = 'position_unavailable';
+                break;
+            case error.TIMEOUT:
+                errorMessage += t('timeout', 'Request timeout.');
+                errorKey = 'timeout';
+                break;
+            default:
+                errorMessage += t('unknown_error', 'Unknown error.');
+                errorKey = 'unknown_error';
+        }
+        
+        showMessage(errorKey, 'error');
+    }
+    
     function useDefaultLocation() {
-        // Set default to Tunis, Tunisia
-        userLocation.lat = 36.8065;
-        userLocation.lon = 10.1815;
+        // Get values from inputs
+        const lat = parseFloat(latitudeInput.value);
+        const lon = parseFloat(longitudeInput.value);
         
-        latitudeInput.value = userLocation.lat;
-        longitudeInput.value = userLocation.lon;
-        
-        showMessage('using_default_location', 'info');
-        
-        // Update user marker
-        updateUserMarker();
-        centerMapOnUser();
-        
-        // Auto-search for services
-        findServices();
+        if (!isNaN(lat) && !isNaN(lon)) {
+            userLocation.lat = lat;
+            userLocation.lon = lon;
+            
+            showMessage(t('location_updated', 'Location updated from inputs'), 'success');
+            
+            // Update user marker
+            updateUserMarker();
+            centerMapOnUser();
+            showSearchRadius();
+            
+            // Auto-search for services
+            findServices();
+        } else {
+            showMessage('invalid_coordinates', 'error');
+        }
     }
     
     function findServices() {
@@ -296,6 +460,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update user marker position
         updateUserMarker();
         
+        // Show search radius on map
+        showSearchRadius();
+        
         // Make API request
         fetch(`/api/services?lat=${lat}&lon=${lon}&category=${category}&max_distance=${maxDistance}`)
             .then(response => response.json())
@@ -306,9 +473,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     displayServicesOnMap(currentServices);
                     updateResultsCount();
                     
-                    // Zoom to fit all markers if we have services
                     if (currentServices.length > 0) {
                         zoomToFitMarkers();
+                    } else {
+                        // If no services, show just the radius
+                        map.setView([userLocation.lat, userLocation.lon], 12);
                     }
                 } else {
                     showMessage('search_error', 'error');
@@ -737,6 +906,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
                 case 'fetch_error':
                     message = t('fetch_error', 'Failed to fetch services. Please try again.');
+                    break;
+                case 'location_updated':
+                    message = t('location_updated', 'Location updated from inputs');
+                    break;
+                case 'city_selected':
+                    message = messageKey; // Will be replaced with dynamic content
                     break;
                 default:
                     message = messageKey;
