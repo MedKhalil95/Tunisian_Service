@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const mapContainer = document.getElementById('map');
     const serviceModal = document.getElementById('service-modal');
     const closeModal = document.querySelector('.close-modal');
+    const citySearch = document.getElementById('city-search');
+    const cityDropdown = document.getElementById('city-dropdown');
+    const selectedCityDisplay = document.getElementById('selected-city');
     
     // Map Elements
     const zoomInBtn = document.getElementById('zoom-in');
@@ -49,7 +52,21 @@ document.addEventListener('DOMContentLoaded', function() {
         "La Soukra": {lat: 36.8894, lon: 10.2401},
         "Charguia": {lat: 36.8989, lon: 10.1895},
         "El Ghazala": {lat: 36.8484, lon: 10.2214},
-        "Sidi Bou Said": {lat: 36.8683, lon: 10.3417}
+        "Sidi Bou Said": {lat: 36.8683, lon: 10.3417},
+        "Kairouan": {lat: 35.6781, lon: 10.0963},
+        "Gabès": {lat: 33.8815, lon: 10.0982},
+        "Gafsa": {lat: 34.4250, lon: 8.7842},
+        "Tozeur": {lat: 33.9197, lon: 8.1335},
+        "Kasserine": {lat: 35.1676, lon: 8.8365},
+        "Béja": {lat: 36.7256, lon: 9.1817},
+        "Jendouba": {lat: 36.5011, lon: 8.7808},
+        "Kef": {lat: 36.1742, lon: 8.7047},
+        "Mahdia": {lat: 35.5047, lon: 11.0622},
+        "Médenine": {lat: 33.3545, lon: 10.5055},
+        "Tataouine": {lat: 32.9297, lon: 10.4518},
+        "Zaghouan": {lat: 36.4029, lon: 10.1429},
+        "Siliana": {lat: 36.0849, lon: 9.3708},
+        "Kébili": {lat: 33.7044, lon: 8.9652}
     };
     
     // Initialize Map
@@ -145,8 +162,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Initialize city search
+        // Initialize city search and dropdown
         initCitySearch();
+        initCityDropdown();
         
         // Set default location in inputs
         latitudeInput.value = userLocation.lat;
@@ -163,6 +181,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update input placeholders based on language
         updateInputPlaceholders();
+        
+        // Update selected city display
+        updateSelectedCityDisplay();
     }
     
     function initCitySearch() {
@@ -201,6 +222,89 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    function initCityDropdown() {
+        const cityDropdown = document.getElementById('city-dropdown');
+        const citySearch = document.getElementById('city-search');
+        const cityList = document.getElementById('city-list');
+        
+        if (!cityDropdown || !citySearch) return;
+        
+        // Toggle dropdown when clicking on the search input
+        citySearch.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleCityDropdown();
+        });
+        
+        // Populate dropdown with all cities
+        populateCityDropdown();
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!cityDropdown.contains(e.target) && !citySearch.contains(e.target)) {
+                cityDropdown.style.display = 'none';
+            }
+        });
+    }
+    
+    function populateCityDropdown() {
+        const cityList = document.getElementById('city-list');
+        if (!cityList) return;
+        
+        cityList.innerHTML = '';
+        
+        // Sort cities alphabetically
+        const sortedCities = Object.keys(TUNISIAN_CITIES).sort();
+        
+        sortedCities.forEach(city => {
+            const item = document.createElement('div');
+            item.className = 'city-dropdown-item';
+            item.innerHTML = `
+                <i class="fas fa-city"></i>
+                <span>${city}</span>
+                <small>${TUNISIAN_CITIES[city].lat.toFixed(4)}, ${TUNISIAN_CITIES[city].lon.toFixed(4)}</small>
+            `;
+            item.addEventListener('click', () => {
+                selectCity({
+                    name: city,
+                    lat: TUNISIAN_CITIES[city].lat,
+                    lon: TUNISIAN_CITIES[city].lon
+                });
+                document.getElementById('city-dropdown').style.display = 'none';
+            });
+            cityList.appendChild(item);
+        });
+    }
+    
+    function toggleCityDropdown() {
+        const cityDropdown = document.getElementById('city-dropdown');
+        if (cityDropdown.style.display === 'block') {
+            cityDropdown.style.display = 'none';
+        } else {
+            cityDropdown.style.display = 'block';
+        }
+    }
+    
+    function updateSelectedCityDisplay() {
+        const selectedCityDisplay = document.getElementById('selected-city');
+        if (!selectedCityDisplay) return;
+        
+        // Find city name from coordinates
+        let cityName = '';
+        for (const [city, coords] of Object.entries(TUNISIAN_CITIES)) {
+            if (Math.abs(coords.lat - userLocation.lat) < 0.01 && 
+                Math.abs(coords.lon - userLocation.lon) < 0.01) {
+                cityName = city;
+                break;
+            }
+        }
+        
+        if (cityName) {
+            selectedCityDisplay.innerHTML = `<i class="fas fa-check-circle"></i> ${cityName}`;
+        } else {
+            selectedCityDisplay.innerHTML = `<i class="fas fa-map-pin"></i> ${t('custom_location', 'Custom Location')}`;
+        }
+    }
+    
     function displayCitySuggestions(cities) {
         const citySuggestions = document.getElementById('city-suggestions');
         citySuggestions.innerHTML = '';
@@ -232,13 +336,17 @@ document.addEventListener('DOMContentLoaded', function() {
         longitudeInput.value = userLocation.lon.toFixed(6);
         document.getElementById('city-search').value = city.name;
         
-        // Hide suggestions
+        // Hide suggestions and dropdown
         document.getElementById('city-suggestions').style.display = 'none';
+        document.getElementById('city-dropdown').style.display = 'none';
         
         // Update map
         updateUserMarker();
         map.setView([userLocation.lat, userLocation.lon], 13);
         showSearchRadius();
+        
+        // Update selected city display
+        updateSelectedCityDisplay();
         
         // Show success message
         showMessage(t('city_selected', `Selected: ${city.name}`), 'success');
@@ -260,6 +368,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Clear city search input
             document.getElementById('city-search').value = '';
+            
+            // Update selected city display
+            updateSelectedCityDisplay();
         }
     }
     
@@ -274,6 +385,10 @@ document.addEventListener('DOMContentLoaded', function() {
             updateEmptyStateMessages();
             updateResultsCount();
             updateUserMarkerPopup();
+            updateSelectedCityDisplay();
+            
+            // Repopulate dropdown with translated city names if needed
+            // Note: City names remain in English/Latin script
         });
     }
     
@@ -287,19 +402,37 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateInputPlaceholders() {
         // Update input placeholders based on current language
         const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
+        const citySearchInput = document.getElementById('city-search');
+        const citySearchLabel = document.querySelector('label[for="city-search"]');
         
+        // Update coordinate input placeholders
         if (lang === 'ar') {
             latitudeInput.placeholder = 'مثال: 36.8065';
             longitudeInput.placeholder = 'مثال: 10.1815';
-            document.getElementById('city-search').placeholder = 'ابحث عن مدينة في تونس...';
+            if (citySearchInput) {
+                citySearchInput.placeholder = 'ابحث عن مدينة في تونس...';
+            }
+            if (citySearchLabel) {
+                citySearchLabel.innerHTML = 'ابحث عن مدينة:';
+            }
         } else if (lang === 'fr') {
             latitudeInput.placeholder = 'Exemple: 36.8065';
             longitudeInput.placeholder = 'Exemple: 10.1815';
-            document.getElementById('city-search').placeholder = 'Rechercher une ville en Tunisie...';
+            if (citySearchInput) {
+                citySearchInput.placeholder = 'Rechercher une ville en Tunisie...';
+            }
+            if (citySearchLabel) {
+                citySearchLabel.innerHTML = 'Rechercher une ville:';
+            }
         } else {
             latitudeInput.placeholder = 'Example: 36.8065';
             longitudeInput.placeholder = 'Example: 10.1815';
-            document.getElementById('city-search').placeholder = 'Search for a city in Tunisia...';
+            if (citySearchInput) {
+                citySearchInput.placeholder = 'Search for a city in Tunisia...';
+            }
+            if (citySearchLabel) {
+                citySearchLabel.innerHTML = 'Search City:';
+            }
         }
     }
     
@@ -369,6 +502,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Clear city search
                 document.getElementById('city-search').value = '';
                 
+                // Update selected city display
+                updateSelectedCityDisplay();
+                
                 showMessage('location_success', 'success');
                 getLocationBtn.innerHTML = `<i class="fas fa-location-crosshairs"></i> ${t('use_my_location', 'Use My Location')}`;
                 getLocationBtn.disabled = false;
@@ -422,6 +558,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isNaN(lat) && !isNaN(lon)) {
             userLocation.lat = lat;
             userLocation.lon = lon;
+            
+            // Update selected city display
+            updateSelectedCityDisplay();
             
             showMessage(t('location_updated', 'Location updated from inputs'), 'success');
             
@@ -997,3 +1136,23 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 });
+// Debug function to test translations
+window.testTranslation = function() {
+    if (window.translator) {
+        console.log('Current language:', window.translator.getCurrentLanguage());
+        console.log('Translator object:', window.translator);
+        
+        // Force change language to test
+        setTimeout(() => {
+            window.translator.changeLanguage('en');
+            setTimeout(() => {
+                window.translator.changeLanguage('ar');
+            }, 2000);
+        }, 1000);
+    } else {
+        console.log('Translator not found');
+    }
+};
+
+// Call test after 3 seconds
+setTimeout(testTranslation, 3000);

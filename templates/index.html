@@ -13,6 +13,154 @@
           crossorigin=""/>
     <!-- Leaflet Awesome Markers -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css">
+    <style>
+        /* City Dropdown Styles */
+        .city-dropdown-container {
+            position: relative;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .city-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .city-dropdown-header {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .city-list {
+            padding: 5px 0;
+        }
+
+        .city-dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .city-dropdown-item:hover {
+            background: #f0f7ff;
+        }
+
+        .city-dropdown-item i {
+            color: #3498db;
+            width: 20px;
+        }
+
+        .city-dropdown-item small {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+
+        /* Selected City Display */
+        .selected-city-display {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #e8f4fd;
+            border-radius: 6px;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selected-city-display i {
+            color: #3498db;
+        }
+
+        /* Update city search container */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+            z-index: 1;
+        }
+
+        .city-search-input {
+            width: 100%;
+            padding: 10px 12px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .city-search-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+        }
+        
+        /* Suggestions box */
+        .suggestions-box {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1001;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 2px;
+        }
+
+        .suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .suggestion-item:hover {
+            background: #f0f7ff;
+        }
+
+        .suggestion-item i {
+            color: #3498db;
+            width: 20px;
+        }
+
+        .suggestion-item small {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -41,49 +189,69 @@
             <div class="app-container">
                 <div class="left-panel">
                     <div class="location-section card">
-    <h2><i class="fas fa-location-dot"></i> <span data-translate="location">موقعك</span></h2>
-    <div class="location-info">
-        <div id="location-status">
-            <p data-translate="location_instruction">اضغط على الزر لاستخدام موقعك أو أدخل الإحداثيات يدوياً.</p>
-        </div>
-        
-        <!-- New City Search Bar -->
-        <div class="city-search-container">
-            <label for="city-search" data-translate="search_city">:</label>
-            <div class="search-wrapper">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" 
-                       id="city-search" 
-                       class="city-search-input" 
-                       placeholder="ابحث عن مدينة في تونس..." 
-                       autocomplete="off">
-                <div id="city-suggestions" class="suggestions-box"></div>
-            </div>
-        </div>
-        
-        <div class="coordinates-input">
-            <div class="input-group">
-                <label for="latitude" data-translate="latitude">خط العرض:</label>
-                <input type="number" id="latitude" placeholder="مثال: 36.8065" step="0.0001">
-            </div>
-            <div class="input-group">
-                <label for="longitude" data-translate="longitude">خط الطول:</label>
-                <input type="number" id="longitude" placeholder="مثال: 10.1815" step="0.0001">
-            </div>
-        </div>
-        
-        <div class="button-group">
-            <button id="get-location-btn" class="btn primary">
-                <i class="fas fa-location-crosshairs"></i>
-                <span data-translate="use_my_location">استخدام موقعي</span>
-            </button>
-            <button id="use-default-btn" class="btn secondary">
-                <i class="fas fa-map-pin"></i>
-                <span data-translate="apply_coordinates">تطبيق الإحداثيات</span>
-            </button>
-        </div>
-    </div>
-</div>
+                        <h2><i class="fas fa-location-dot"></i> <span data-translate="location">موقعك</span></h2>
+                        <div class="location-info">
+                            <div id="location-status">
+                                <p data-translate="location_instruction">اضغط على الزر لاستخدام موقعك أو أدخل الإحداثيات يدوياً.</p>
+                            </div>
+                            
+                            <!-- City Search Section -->
+                            <div class="city-search-container">
+                                <label for="city-search" class="city-search-label" data-translate="search_city">ابحث عن مدينة:</label>
+                                <div class="search-wrapper">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" 
+                                           id="city-search"
+                                           name="search_city" 
+                                           class="city-search-input" 
+                                           placeholder="ابحث عن مدينة في تونس..."
+                                           autocomplete="off">
+                                    
+                                    <div id="city-suggestions" class="suggestions-box"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- City Dropdown -->
+                            <div class="city-dropdown-container">
+                                <div id="city-dropdown" class="city-dropdown">
+                                    <div class="city-dropdown-header">
+                                        <i class="fas fa-list"></i>
+                                        <span data-translate="select_city">اختر مدينة من القائمة</span>
+                                    </div>
+                                    <div id="city-list" class="city-list"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Selected City Display -->
+                            <div id="selected-city" class="selected-city-display">
+                                <i class="fas fa-map-pin"></i>
+                                <span>Tunis</span>
+                            </div>
+                            
+                            <div class="coordinates-input">
+                                <div class="input-group">
+                                    <label for="latitude" data-translate="latitude">خط العرض:</label>
+                                    <input type="number" id="latitude" placeholder="مثال: 36.8065" step="0.0001">
+                                </div>
+                                <div class="input-group">
+                                    <label for="longitude" data-translate="longitude">خط الطول:</label>
+                                    <input type="number" id="longitude" placeholder="مثال: 10.1815" step="0.0001">
+                                </div>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button id="get-location-btn" class="btn primary">
+                                    <i class="fas fa-location-crosshairs"></i>
+                                    <span data-translate="use_my_location">استخدام موقعي</span>
+                                </button>
+                                <button id="use-default-btn" class="btn secondary">
+                                    <i class="fas fa-map-pin"></i>
+                                    <span data-translate="apply_coordinates">تطبيق الإحداثيات</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="filters-section card">
                         <h2><i class="fas fa-filter"></i> <span data-translate="filters">الفلاتر</span></h2>
                         <div class="filter-group">
@@ -182,7 +350,7 @@
             crossorigin=""></script>
     <!-- Leaflet Awesome Markers -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.min.js"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

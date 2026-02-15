@@ -74,6 +74,8 @@ class TranslationSystem {
                 'locate_me': 'تحديد موقعي',
                 'reset_view': 'عرض افتراضي',
                 "search_city": "ابحث عن مدينة في تونس",
+                "search_city_placeholder": "ابحث عن مدينة في تونس...",
+                "select_city": "اختر مدينة",
                 "apply_coordinates": "تطبيق الإحداثيات",
                 "city_selected": "تم اختيار: ",
                 "location_updated": "تم تحديث الموقع من الإحداثيات المدخلة"
@@ -149,6 +151,8 @@ class TranslationSystem {
                 'locate_me': 'Locate Me',
                 'reset_view': 'Reset View',
                 "search_city": "Search for a city in Tunisia",
+                "search_city_placeholder": "Search for a city in Tunisia...",
+                "select_city": "Select City",
                 "apply_coordinates": "Apply Coordinates",
                 "city_selected": "Selected: ",
                 "location_updated": "Location updated from entered coordinates"
@@ -225,6 +229,8 @@ class TranslationSystem {
                 'locate_me': 'Me Localiser',
                 'reset_view': 'Vue par Défaut',
                 "search_city": "Rechercher une ville en Tunisie",
+                "search_city_placeholder": "Rechercher une ville en Tunisie...",
+                "select_city": "Sélectionner une Ville",
                 "apply_coordinates": "Appliquer les Coordonnées",
                 "city_selected": "Sélectionné  ",
                 "location_updated": "Emplacement mis à jour à partir des coordonnées saisies"
