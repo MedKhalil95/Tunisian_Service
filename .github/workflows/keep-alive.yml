@@ -1,0 +1,28 @@
+name: Keep Website Alive
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"  # runs every 5 minutes
+  workflow_dispatch:       # allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Python script
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+      - name: Install requests
+        run: pip install requests
+      - name: Ping website
+        run: |
+          python - << 'EOF'
+          import requests
+          url = "https://tunisian-service.onrender.com/"
+          try:
+              r = requests.get(url)
+              print("Status:", r.status_code)
+          except Exception as e:
+              print("Error:", e)
+          EOF
