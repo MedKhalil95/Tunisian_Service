@@ -2,27 +2,48 @@ name: Keep Website Alive
 
 on:
   schedule:
-    - cron: "*/5 * * * *"  # runs every 5 minutes
+    - cron: "*/10 * * * *"  # runs every 10 minutes (more reliable)
   workflow_dispatch:       # allow manual trigger
 
 jobs:
-  ping:
+  keep-alive:
     runs-on: ubuntu-latest
     steps:
-      - name: Run Python script
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
-      - name: Install requests
+          python-version: "3.11"
+      
+      - name: Install dependencies
         run: pip install requests
-      - name: Ping website
+      
+      - name: Ping website with retries
         run: |
           python - << 'EOF'
           import requests
+          import time
+          
           url = "https://tunisian-service.onrender.com/"
-          try:
-              r = requests.get(url)
-              print("Status:", r.status_code)
-          except Exception as e:
-              print("Error:", e)
+          max_retries = 3
+          retry_delay = 2
+          
+          for attempt in range(max_retries):
+              try:
+                  print(f"Attempt {attempt + 1}/{max_retries}: Pinging {url}")
+                  response = requests.get(url, timeout=30)
+                  print(f"✓ Success! Status code: {response.status_code}")
+                  print(f"Response time: {response.elapsed.total_seconds():.2f}s")
+                  break
+              except requests.exceptions.RequestException as e:
+                  print(f"✗ Attempt {attempt + 1} failed: {str(e)}")
+                  if attempt < max_retries - 1:
+                      print(f"Retrying in {retry_delay} seconds...")
+                      time.sleep(retry_delay)
+                  else:
+                      print("All retry attempts failed!")
+                      exit(1)
           EOF
+      
+      - name: Send notification on failure (optional)
+        if: failure()
+        run: echo "Keep-alive ping failed - application may have gone to sleep"
