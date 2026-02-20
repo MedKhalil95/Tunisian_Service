@@ -33,9 +33,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let map = null;
     let userMarker = null;
     let serviceMarkers = [];
-    let userMarkerCircle = null; // For showing search radius
+    let userMarkerCircle = null;
     
-    // Tunisian Cities data from services_data.py
+    // Tunisian Cities data
     const TUNISIAN_CITIES = {
         "Tunis": {lat: 36.8065, lon: 10.1815},
         "Sousse": {lat: 35.8288, lon: 10.6405},
@@ -74,9 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize App
     initApp();
-    
-    // Initialize Translations
-    initTranslations();
     
     function initMap() {
         // Initialize Leaflet map centered on Tunisia
@@ -120,13 +117,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }).addTo(map);
         
         // Add popup to user marker
-        userMarker.bindPopup(`
-            <div style="text-align: center;">
-                <h3>${t('your_location', 'Your Location')}</h3>
-                <p>${t('latitude', 'Latitude')}: ${userLocation.lat.toFixed(6)}</p>
-                <p>${t('longitude', 'Longitude')}: ${userLocation.lon.toFixed(6)}</p>
-            </div>
-        `);
+        updateUserMarkerPopup();
+    }
+    
+    function updateUserMarkerPopup() {
+        if (userMarker) {
+            userMarker.bindPopup(`
+                <div style="text-align: center;">
+                    <h3>${t('your_location', 'Your Location')}</h3>
+                    <p>${t('latitude', 'Latitude')}: ${userLocation.lat.toFixed(6)}</p>
+                    <p>${t('longitude', 'Longitude')}: ${userLocation.lon.toFixed(6)}</p>
+                </div>
+            `);
+        }
     }
     
     function centerMapOnUser() {
@@ -146,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
         useDefaultBtn.addEventListener('click', useDefaultLocation);
         findServicesBtn.addEventListener('click', findServices);
         distanceSlider.addEventListener('input', updateDistanceValue);
-        distanceSlider.addEventListener('change', showSearchRadius); // Update radius when slider changes
+        distanceSlider.addEventListener('change', showSearchRadius);
         closeModal.addEventListener('click', () => {
             serviceModal.style.display = 'none';
         });
@@ -184,6 +187,29 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update selected city display
         updateSelectedCityDisplay();
+        
+        // Listen for language changes
+        document.addEventListener('languageChanged', () => {
+            console.log('Language changed event received');
+            updateInputPlaceholders();
+            updateEmptyStateMessages();
+            updateResultsCount();
+            updateUserMarkerPopup();
+            updateSelectedCityDisplay();
+            updateMapControlTitles();
+            
+            // Refresh service display if there are services
+            if (currentServices.length > 0) {
+                displayServices(currentServices);
+            }
+        });
+    }
+    
+    function updateMapControlTitles() {
+        if (zoomInBtn) zoomInBtn.title = t('zoom_in', 'Zoom In');
+        if (zoomOutBtn) zoomOutBtn.title = t('zoom_out', 'Zoom Out');
+        if (locateMeBtn) locateMeBtn.title = t('locate_me', 'Locate Me');
+        if (resetViewBtn) resetViewBtn.title = t('reset_view', 'Reset View');
     }
     
     function initCitySearch() {
@@ -225,7 +251,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function initCityDropdown() {
         const cityDropdown = document.getElementById('city-dropdown');
         const citySearch = document.getElementById('city-search');
-        const cityList = document.getElementById('city-list');
         
         if (!cityDropdown || !citySearch) return;
         
@@ -284,27 +309,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function updateSelectedCityDisplay() {
-        const selectedCityDisplay = document.getElementById('selected-city');
-        if (!selectedCityDisplay) return;
-        
-        // Find city name from coordinates
-        let cityName = '';
-        for (const [city, coords] of Object.entries(TUNISIAN_CITIES)) {
-            if (Math.abs(coords.lat - userLocation.lat) < 0.01 && 
-                Math.abs(coords.lon - userLocation.lon) < 0.01) {
-                cityName = city;
-                break;
-            }
-        }
-        
-        if (cityName) {
-            selectedCityDisplay.innerHTML = `<i class="fas fa-check-circle"></i> ${cityName}`;
-        } else {
-            selectedCityDisplay.innerHTML = `<i class="fas fa-map-pin"></i> ${t('custom_location', 'Custom Location')}`;
-        }
-    }
-    
     function displayCitySuggestions(cities) {
         const citySuggestions = document.getElementById('city-suggestions');
         citySuggestions.innerHTML = '';
@@ -355,6 +359,27 @@ document.addEventListener('DOMContentLoaded', function() {
         findServices();
     }
     
+    function updateSelectedCityDisplay() {
+        const selectedCityDisplay = document.getElementById('selected-city');
+        if (!selectedCityDisplay) return;
+        
+        // Find city name from coordinates
+        let cityName = '';
+        for (const [city, coords] of Object.entries(TUNISIAN_CITIES)) {
+            if (Math.abs(coords.lat - userLocation.lat) < 0.01 && 
+                Math.abs(coords.lon - userLocation.lon) < 0.01) {
+                cityName = city;
+                break;
+            }
+        }
+        
+        if (cityName) {
+            selectedCityDisplay.innerHTML = `<i class="fas fa-check-circle"></i> ${cityName}`;
+        } else {
+            selectedCityDisplay.innerHTML = `<i class="fas fa-map-pin"></i> ${t('custom_location', 'Custom Location')}`;
+        }
+    }
+    
     function updateUserLocationFromInputs() {
         const lat = parseFloat(latitudeInput.value);
         const lon = parseFloat(longitudeInput.value);
@@ -374,65 +399,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function initTranslations() {
-        // Update map control titles when language changes
-        updateMapControlTitles();
-        
-        // Listen for language changes
-        document.addEventListener('languageChanged', () => {
-            updateMapControlTitles();
-            updateInputPlaceholders();
-            updateEmptyStateMessages();
-            updateResultsCount();
-            updateUserMarkerPopup();
-            updateSelectedCityDisplay();
-            
-            // Repopulate dropdown with translated city names if needed
-            // Note: City names remain in English/Latin script
-        });
-    }
-    
-    function updateMapControlTitles() {
-        if (zoomInBtn) zoomInBtn.title = t('zoom_in', 'Zoom In');
-        if (zoomOutBtn) zoomOutBtn.title = t('zoom_out', 'Zoom Out');
-        if (locateMeBtn) locateMeBtn.title = t('locate_me', 'Locate Me');
-        if (resetViewBtn) resetViewBtn.title = t('reset_view', 'Reset View');
-    }
-    
     function updateInputPlaceholders() {
         // Update input placeholders based on current language
-        const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
         const citySearchInput = document.getElementById('city-search');
         const citySearchLabel = document.querySelector('label[for="city-search"]');
         
         // Update coordinate input placeholders
-        if (lang === 'ar') {
-            latitudeInput.placeholder = 'مثال: 36.8065';
-            longitudeInput.placeholder = 'مثال: 10.1815';
-            if (citySearchInput) {
-                citySearchInput.placeholder = 'ابحث عن مدينة في تونس...';
-            }
-            if (citySearchLabel) {
-                citySearchLabel.innerHTML = 'ابحث عن مدينة:';
-            }
-        } else if (lang === 'fr') {
-            latitudeInput.placeholder = 'Exemple: 36.8065';
-            longitudeInput.placeholder = 'Exemple: 10.1815';
-            if (citySearchInput) {
-                citySearchInput.placeholder = 'Rechercher une ville en Tunisie...';
-            }
-            if (citySearchLabel) {
-                citySearchLabel.innerHTML = 'Rechercher une ville:';
-            }
-        } else {
-            latitudeInput.placeholder = 'Example: 36.8065';
-            longitudeInput.placeholder = 'Example: 10.1815';
-            if (citySearchInput) {
-                citySearchInput.placeholder = 'Search for a city in Tunisia...';
-            }
-            if (citySearchLabel) {
-                citySearchLabel.innerHTML = 'Search City:';
-            }
+        latitudeInput.placeholder = t('latitude', 'Latitude') + ': 36.8065';
+        longitudeInput.placeholder = t('longitude', 'Longitude') + ': 10.1815';
+        
+        if (citySearchInput) {
+            citySearchInput.placeholder = t('search_city_placeholder', 'Search for a city in Tunisia...');
+        }
+        if (citySearchLabel) {
+            citySearchLabel.innerHTML = t('search_city', 'Search City:');
         }
     }
     
@@ -441,21 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const emptyState = resultsContainer.querySelector('.empty-state');
         if (emptyState && emptyState.querySelector('p')) {
             const p = emptyState.querySelector('p');
-            if (p.getAttribute('data-translate') === 'results_will_appear') {
-                p.textContent = t('results_will_appear', 'Search results will appear here');
-            }
-        }
-    }
-    
-    function updateUserMarkerPopup() {
-        if (userMarker) {
-            userMarker.getPopup().setContent(`
-                <div style="text-align: center;">
-                    <h3>${t('your_location', 'Your Location')}</h3>
-                    <p>${t('latitude', 'Latitude')}: ${userLocation.lat.toFixed(6)}</p>
-                    <p>${t('longitude', 'Longitude')}: ${userLocation.lon.toFixed(6)}</p>
-                </div>
-            `);
+            p.textContent = t('results_will_appear', 'Search results will appear here');
         }
     }
     
@@ -483,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function getUserLocation() {
         if (!navigator.geolocation) {
-            showMessage('browser_no_geolocation', 'error');
+            showMessage(t('browser_no_geolocation', 'Browser does not support geolocation'), 'error');
             return;
         }
         
@@ -505,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update selected city display
                 updateSelectedCityDisplay();
                 
-                showMessage('location_success', 'success');
+                showMessage(t('location_success', 'Your location has been determined successfully!'), 'success');
                 getLocationBtn.innerHTML = `<i class="fas fa-location-crosshairs"></i> ${t('use_my_location', 'Use My Location')}`;
                 getLocationBtn.disabled = false;
                 
@@ -526,28 +492,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function handleLocationError(error) {
-        let errorKey = 'location_error';
         let errorMessage = t('location_error', 'Unable to determine your location. ');
         
         switch(error.code) {
             case error.PERMISSION_DENIED:
                 errorMessage += t('permission_denied', 'Permission denied.');
-                errorKey = 'permission_denied';
                 break;
             case error.POSITION_UNAVAILABLE:
                 errorMessage += t('position_unavailable', 'Position unavailable.');
-                errorKey = 'position_unavailable';
                 break;
             case error.TIMEOUT:
                 errorMessage += t('timeout', 'Request timeout.');
-                errorKey = 'timeout';
                 break;
             default:
                 errorMessage += t('unknown_error', 'Unknown error.');
-                errorKey = 'unknown_error';
         }
         
-        showMessage(errorKey, 'error');
+        showMessage(errorMessage, 'error');
     }
     
     function useDefaultLocation() {
@@ -572,7 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Auto-search for services
             findServices();
         } else {
-            showMessage('invalid_coordinates', 'error');
+            showMessage(t('invalid_coordinates', 'Please enter valid coordinates'), 'error');
         }
     }
     
@@ -582,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const lon = parseFloat(longitudeInput.value);
         
         if (isNaN(lat) || isNaN(lon)) {
-            showMessage('invalid_coordinates', 'error');
+            showMessage(t('invalid_coordinates', 'Please enter valid coordinates'), 'error');
             return;
         }
         
@@ -619,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         map.setView([userLocation.lat, userLocation.lon], 12);
                     }
                 } else {
-                    showMessage('search_error', 'error');
+                    showMessage(t('search_error', 'Error searching for services'), 'error');
                     resultsContainer.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-exclamation-circle fa-3x"></i>
@@ -630,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                showMessage('fetch_error', 'error');
+                showMessage(t('fetch_error', 'Failed to fetch services. Please try again.'), 'error');
             })
             .finally(() => {
                 findServicesBtn.innerHTML = `<i class="fas fa-search"></i> ${t('find_nearby_services', 'Find Nearby Services')}`;
@@ -732,16 +693,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function formatPhoneNumber(phone) {
-        // Format phone number based on language direction
-        const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
-        
-        if (lang === 'ar') {
-            // RTL format
-            return phone.replace(/(\+\d{1,3})(\d{2})(\d{3})(\d{3})/, '$1 $2 $3 $4');
-        } else {
-            // LTR format
-            return phone.replace(/(\+\d{1,3})(\d{2})(\d{3})(\d{3})/, '$1 $2 $3 $4');
-        }
+        // Format phone number
+        return phone.replace(/(\+\d{1,3})(\d{2})(\d{3})(\d{3})/, '$1 $2 $3 $4');
     }
     
     function displayServicesOnMap(services) {
@@ -753,16 +706,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Define marker icons for each category
-        const iconClasses = {
-            'transporter': 'transporter-marker',
-            'doctor': 'doctor-marker',
-            'pharmacy': 'pharmacy-marker',
-            'mechanic': 'mechanic-marker',
-            'restaurant': 'restaurant-marker',
-            'technician': 'technician-marker'
-        };
-        
-        // Define icons for each category
         const iconHTMLs = {
             'transporter': '<i class="fas fa-car"></i>',
             'doctor': '<i class="fas fa-user-md"></i>',
@@ -774,7 +717,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         services.forEach(service => {
             // Create custom icon for each service
-            const iconClass = iconClasses[service.category] || 'other-marker';
+            const iconClass = `${service.category}-marker`;
             const iconHTML = iconHTMLs[service.category] || '<i class="fas fa-map-marker"></i>';
             
             const serviceIcon = L.divIcon({
@@ -789,19 +732,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 title: service.name
             }).addTo(map);
             
-            // Create popup content with proper text direction
-            const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
-            const textDirection = lang === 'ar' ? 'rtl' : 'ltr';
-            const textAlign = lang === 'ar' ? 'right' : 'left';
-            
+            // Create popup content
             const popupContent = `
-                <div style="text-align: ${textAlign}; direction: ${textDirection}">
+                <div style="text-align: left; direction: ltr">
                     <h3 style="margin: 0 0 10px 0; color: #2c3e50;">${service.name}</h3>
                     <div class="popup-distance" style="background: #3498db; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; display: inline-block; margin-bottom: 10px;">
                         ${service.distance} ${t('km', 'km')}
                     </div>
                     <p style="margin: 5px 0;"><strong>${t('address', 'Address')}:</strong> ${service.address}</p>
-                    <p style="margin: 5px 0;"><strong>${t('phone', 'Phone')}:</strong> <span class="popup-phone">${service.phone}</span></p>
+                    <p style="margin: 5px 0;"><strong>${t('phone', 'Phone')}:</strong> ${service.phone}</p>
                     <p style="margin: 5px 0;"><strong>${t('rating', 'Rating')}:</strong> ${service.rating}/5</p>
                     <p style="margin: 10px 0 0 0; font-size: 0.9rem; color: #7f8c8d;">${service.description}</p>
                     <button onclick="showServiceDetailsFromMap(${service.id})" style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-top: 10px; cursor: pointer; width: 100%;">
@@ -870,7 +809,7 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedService.marker.setZIndexOffset(1000);
             selectedService.marker.openPopup();
             
-            // Pan to the marker with offset
+            // Pan to the marker
             const markerLatLng = selectedService.marker.getLatLng();
             map.panTo([markerLatLng.lat, markerLatLng.lng], {
                 animate: true,
@@ -914,14 +853,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Format phone number
         const phoneFormatted = formatPhoneNumber(service.phone);
-        
-        // Set modal direction based on language
-        const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
-        const modalDirection = lang === 'ar' ? 'rtl' : 'ltr';
-        const modalTextAlign = lang === 'ar' ? 'right' : 'left';
-        
-        modalBody.setAttribute('dir', modalDirection);
-        modalBody.style.textAlign = modalTextAlign;
         
         modalBody.innerHTML = `
             <h2 class="modal-service-name">${service.name}</h2>
@@ -1006,66 +937,16 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
     
-    function showMessage(messageKey, type) {
-        // Get translated message
-        let message = t(messageKey, messageKey);
-        
-        // If it's still a key (not found), use default messages
-        if (message === messageKey) {
-            switch(messageKey) {
-                case 'location_success':
-                    message = t('location_success', 'Your location has been determined successfully!');
-                    break;
-                case 'using_default_location':
-                    message = t('using_default_location', 'Using default Tunisia location');
-                    break;
-                case 'invalid_coordinates':
-                    message = t('invalid_coordinates', 'Please enter valid coordinates');
-                    break;
-                case 'browser_no_geolocation':
-                    message = t('browser_no_geolocation', 'Browser does not support geolocation');
-                    break;
-                case 'location_error':
-                    message = t('location_error', 'Unable to determine your location');
-                    break;
-                case 'permission_denied':
-                    message = t('permission_denied', 'Permission denied');
-                    break;
-                case 'position_unavailable':
-                    message = t('position_unavailable', 'Position unavailable');
-                    break;
-                case 'timeout':
-                    message = t('timeout', 'Request timeout');
-                    break;
-                case 'unknown_error':
-                    message = t('unknown_error', 'Unknown error');
-                    break;
-                case 'search_error':
-                    message = t('search_error', 'Error searching for services');
-                    break;
-                case 'fetch_error':
-                    message = t('fetch_error', 'Failed to fetch services. Please try again.');
-                    break;
-                case 'location_updated':
-                    message = t('location_updated', 'Location updated from inputs');
-                    break;
-                case 'city_selected':
-                    message = messageKey; // Will be replaced with dynamic content
-                    break;
-                default:
-                    message = messageKey;
-            }
-        }
-        
+    function showMessage(message, type = 'info') {
         // Remove any existing message
-        const existingMessage = document.querySelector('.message');
+        const existingMessage = document.querySelector('.custom-message');
         if (existingMessage) {
             existingMessage.remove();
         }
         
         // Create message element
         const messageEl = document.createElement('div');
-        messageEl.className = `message ${type}`;
+        messageEl.className = `custom-message ${type}`;
         messageEl.textContent = message;
         
         // Style based on type
@@ -1080,18 +961,8 @@ document.addEventListener('DOMContentLoaded', function() {
             zIndex: '10000',
             boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
             maxWidth: '300px',
-            textAlign: 'right',
-            direction: 'rtl'
+            textAlign: 'center'
         };
-        
-        // Adjust position based on language
-        const lang = window.translator ? window.translator.getCurrentLanguage() : 'ar';
-        if (lang !== 'ar') {
-            styles.right = 'auto';
-            styles.left = '20px';
-            styles.textAlign = 'left';
-            styles.direction = 'ltr';
-        }
         
         if (type === 'success') {
             styles.backgroundColor = '#2ecc71';
@@ -1113,46 +984,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 5000);
     }
-    
-    // Helper function to get translation
-    function t(key, defaultValue = '') {
-        if (window.translator && typeof window.translator.translate === 'function') {
-            return window.translator.translate(key, defaultValue);
-        }
-        return defaultValue || key;
-    }
-    
-    // Make t function available globally
-    window.t = t;
-    
-    // Dispatch language change event when translator changes language
-    if (window.translator && window.translator.changeLanguage) {
-        const originalChangeLanguage = window.translator.changeLanguage;
-        window.translator.changeLanguage = function(lang) {
-            originalChangeLanguage.call(this, lang);
-            document.dispatchEvent(new CustomEvent('languageChanged', { 
-                detail: { language: lang } 
-            }));
-        };
-    }
 });
-// Debug function to test translations
-window.testTranslation = function() {
-    if (window.translator) {
-        console.log('Current language:', window.translator.getCurrentLanguage());
-        console.log('Translator object:', window.translator);
-        
-        // Force change language to test
-        setTimeout(() => {
-            window.translator.changeLanguage('en');
-            setTimeout(() => {
-                window.translator.changeLanguage('ar');
-            }, 2000);
-        }, 1000);
-    } else {
-        console.log('Translator not found');
-    }
-};
-
-// Call test after 3 seconds
-setTimeout(testTranslation, 3000);

@@ -1,7 +1,7 @@
 // Translation system for Nearby Services Tunisia
 class TranslationSystem {
     constructor() {
-        this.currentLang = 'ar'; // Default language
+        this.currentLang = 'en'; // Default to English
         this.translations = {
             'ar': {
                 // Header
@@ -78,7 +78,10 @@ class TranslationSystem {
                 "select_city": "اختر مدينة",
                 "apply_coordinates": "تطبيق الإحداثيات",
                 "city_selected": "تم اختيار: ",
-                "location_updated": "تم تحديث الموقع من الإحداثيات المدخلة"
+                "location_updated": "تم تحديث الموقع من الإحداثيات المدخلة",
+                
+                // Language
+                'language_changed': 'تم تغيير اللغة إلى العربية'
             },
             'en': {
                 // Header
@@ -95,7 +98,7 @@ class TranslationSystem {
                 
                 // Filters section
                 'filters': 'Filters',
-                'service_type': 'Service Type',
+                'service_type': 'Service Type:',
                 'all_services': 'All Services',
                 'transport_services': 'Transport Services',
                 'medical_services': 'Doctors & Medical',
@@ -155,8 +158,10 @@ class TranslationSystem {
                 "select_city": "Select City",
                 "apply_coordinates": "Apply Coordinates",
                 "city_selected": "Selected: ",
-                "location_updated": "Location updated from entered coordinates"
-        
+                "location_updated": "Location updated from entered coordinates",
+                
+                // Language
+                'language_changed': 'Language changed to English'
             },
             'fr': {
                 // Header
@@ -232,8 +237,11 @@ class TranslationSystem {
                 "search_city_placeholder": "Rechercher une ville en Tunisie...",
                 "select_city": "Sélectionner une Ville",
                 "apply_coordinates": "Appliquer les Coordonnées",
-                "city_selected": "Sélectionné  ",
-                "location_updated": "Emplacement mis à jour à partir des coordonnées saisies"
+                "city_selected": "Sélectionné: ",
+                "location_updated": "Emplacement mis à jour à partir des coordonnées saisies",
+                
+                // Language
+                'language_changed': 'Langue changée en français'
             }
         };
         
@@ -244,6 +252,11 @@ class TranslationSystem {
             'fr': 'Français'
         };
         
+        // Bind methods to ensure 'this' context
+        this.changeLanguage = this.changeLanguage.bind(this);
+        this.setupDropdown = this.setupDropdown.bind(this);
+        
+        // Initialize
         this.init();
     }
     
@@ -252,23 +265,18 @@ class TranslationSystem {
         const savedLang = localStorage.getItem('preferred_language');
         if (savedLang && this.translations[savedLang]) {
             this.currentLang = savedLang;
-        } else {
-            // Detect browser language
-            const browserLang = navigator.language || navigator.userLanguage;
-            if (browserLang.startsWith('ar')) {
-                this.currentLang = 'ar';
-            } else if (browserLang.startsWith('fr')) {
-                this.currentLang = 'fr';
-            } else {
-                this.currentLang = 'en';
-            }
         }
         
-        // Set initial language
-        this.updateLanguage();
-        
-        // Setup language dropdown
-        this.setupDropdown();
+        // Set initial language when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.updateLanguage();
+                this.setupDropdown();
+            });
+        } else {
+            this.updateLanguage();
+            this.setupDropdown();
+        }
     }
     
     setupDropdown() {
@@ -276,26 +284,48 @@ class TranslationSystem {
         const langList = document.getElementById('lang-list');
         const currentLangSpan = document.getElementById('current-lang');
         
+        if (!langBtn || !langList || !currentLangSpan) {
+            console.log('Language dropdown elements not found, retrying...');
+            setTimeout(this.setupDropdown, 500);
+            return;
+        }
+        
+        console.log('Setting up language dropdown');
+        
         // Update current language display
         currentLangSpan.textContent = this.langNames[this.currentLang];
         
-        // Toggle dropdown
-        langBtn.addEventListener('click', (e) => {
+        // Remove any existing event listeners
+        const newLangBtn = langBtn.cloneNode(true);
+        langBtn.parentNode.replaceChild(newLangBtn, langBtn);
+        
+        // Toggle dropdown on button click
+        newLangBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
+            console.log('Language button clicked');
             langList.classList.toggle('show');
         });
         
         // Close dropdown when clicking outside
-        document.addEventListener('click', () => {
-            langList.classList.remove('show');
+        document.addEventListener('click', (e) => {
+            if (!langList.contains(e.target) && !newLangBtn.contains(e.target)) {
+                langList.classList.remove('show');
+            }
         });
         
         // Handle language selection
         const langLinks = langList.querySelectorAll('a');
         langLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
+            // Remove existing listeners
+            const newLink = link.cloneNode(true);
+            link.parentNode.replaceChild(newLink, link);
+            
+            newLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                const lang = link.getAttribute('data-lang');
+                e.stopPropagation();
+                const lang = newLink.getAttribute('data-lang');
+                console.log('Language selected:', lang);
                 this.changeLanguage(lang);
                 langList.classList.remove('show');
             });
@@ -303,33 +333,48 @@ class TranslationSystem {
     }
     
     changeLanguage(lang) {
+        console.log('Changing language to:', lang);
+        
         if (this.translations[lang]) {
             this.currentLang = lang;
             localStorage.setItem('preferred_language', lang);
             this.updateLanguage();
             
             // Update current language display
-            document.getElementById('current-lang').textContent = this.langNames[lang];
+            const currentLangSpan = document.getElementById('current-lang');
+            if (currentLangSpan) {
+                currentLangSpan.textContent = this.langNames[lang];
+            }
             
             // Update HTML direction for RTL languages
             if (lang === 'ar') {
+                document.documentElement.setAttribute('dir', 'rtl');
                 document.body.style.direction = 'rtl';
                 document.body.style.textAlign = 'right';
             } else {
+                document.documentElement.setAttribute('dir', 'ltr');
                 document.body.style.direction = 'ltr';
                 document.body.style.textAlign = 'left';
             }
             
+            // Dispatch language change event for app.js
+            document.dispatchEvent(new CustomEvent('languageChanged', { 
+                detail: { language: lang } 
+            }));
+            
             // Show confirmation message
+            this.showMessage(this.translate('language_changed'), 'success');
         }
     }
     
     updateLanguage() {
+        console.log('Updating language to:', this.currentLang);
+        
         // Update all elements with data-translate attribute
         const elements = document.querySelectorAll('[data-translate]');
         elements.forEach(element => {
             const key = element.getAttribute('data-translate');
-            if (this.translations[this.currentLang][key]) {
+            if (this.translations[this.currentLang] && this.translations[this.currentLang][key]) {
                 // Handle different types of elements
                 if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                     element.placeholder = this.translations[this.currentLang][key];
@@ -344,42 +389,35 @@ class TranslationSystem {
         // Update title tag
         document.title = this.translations[this.currentLang]['title'] || 'Nearby Services Tunisia';
         
-        // Update map control titles
-        this.updateMapControls();
-        
-        // Update any dynamic text in the app (like search button text)
-        this.updateDynamicText();
+        // Update button texts
+        this.updateButtonTexts();
     }
     
-    updateMapControls() {
-        const mapControls = {
-            'zoom-in': this.translations[this.currentLang]['zoom_in'] || 'Zoom In',
-            'zoom-out': this.translations[this.currentLang]['zoom_out'] || 'Zoom Out',
-            'locate-me': this.translations[this.currentLang]['locate_me'] || 'Locate Me',
-            'reset-view': this.translations[this.currentLang]['reset_view'] || 'Reset View'
-        };
-        
-        for (const [id, title] of Object.entries(mapControls)) {
-            const btn = document.getElementById(id);
-            if (btn) {
-                btn.setAttribute('title', title);
-            }
-        }
-    }
-    
-    updateDynamicText() {
-        // This function can be extended to update any dynamically generated text
+    updateButtonTexts() {
+        // Update search button
         const searchBtn = document.getElementById('find-services-btn');
         if (searchBtn) {
-            const span = searchBtn.querySelector('span[data-translate="find_nearby_services"]');
-            if (span && this.translations[this.currentLang]['find_nearby_services']) {
-                span.textContent = this.translations[this.currentLang]['find_nearby_services'];
-            }
+            searchBtn.innerHTML = `<i class="fas fa-search"></i> ${this.translate('find_nearby_services')}`;
+        }
+        
+        // Update location button
+        const locationBtn = document.getElementById('get-location-btn');
+        if (locationBtn) {
+            locationBtn.innerHTML = `<i class="fas fa-location-crosshairs"></i> ${this.translate('use_my_location')}`;
+        }
+        
+        // Update default button
+        const defaultBtn = document.getElementById('use-default-btn');
+        if (defaultBtn) {
+            defaultBtn.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${this.translate('use_tunisia')}`;
         }
     }
     
     translate(key, defaultValue = '') {
-        return this.translations[this.currentLang][key] || defaultValue || key;
+        if (this.translations[this.currentLang] && this.translations[this.currentLang][key]) {
+            return this.translations[this.currentLang][key];
+        }
+        return defaultValue || key;
     }
     
     getCurrentLanguage() {
@@ -391,25 +429,37 @@ class TranslationSystem {
     }
     
     showMessage(message, type = 'info') {
-        // You can integrate this with your existing showMessage function in app.js
-        if (typeof window.showMessage === 'function') {
-            window.showMessage(message, type);
-        } else {
-            // Fallback notification
-            alert(message);
-        }
+        // Create a simple message display
+        const messageEl = document.createElement('div');
+        messageEl.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 10000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            max-width: 300px;
+            text-align: center;
+            background-color: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
+        `;
+        messageEl.textContent = message;
+        document.body.appendChild(messageEl);
+        
+        setTimeout(() => {
+            if (messageEl.parentNode) {
+                messageEl.parentNode.removeChild(messageEl);
+            }
+        }, 3000);
     }
 }
 
-// Initialize translation system when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.translator = new TranslationSystem();
-});
+// Initialize translation system
+window.translator = new TranslationSystem();
 
-// Helper function to translate text in JavaScript
-function t(key, defaultValue = '') {
-    if (window.translator) {
-        return window.translator.translate(key, defaultValue);
-    }
-    return defaultValue || key;
-}
+// Helper function for translations
+window.t = function(key, defaultValue = '') {
+    return window.translator ? window.translator.translate(key, defaultValue) : (defaultValue || key);
+};
