@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         "Ariana": {lat: 36.8625, lon: 10.1956},
         "Ben Arous": {lat: 36.7545, lon: 10.2217},
         "La Marsa": {lat: 36.8762, lon: 10.3243},
-        "Megrine": {lat: 36.7809, lon: 10.2250},
+        "Megrine": {lat: 36.7737979, lon: 10.2290681},
         "El Manar": {lat: 36.8526, lon: 10.2012},
         "La Soukra": {lat: 36.8894, lon: 10.2401},
         "Charguia": {lat: 36.8989, lon: 10.1895},

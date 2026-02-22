@@ -388,6 +388,71 @@ SERVICES = [
             "rating": 4.2,
             "description": "Chef de projet",
             "distance": None
+        },
+        {
+            "id": 29,
+            "name": "Last Exit Food",
+            "category": "restaurant",
+            "subcategory": "Pizza, Burger, Baguettes Farcies, Makloub, Cornet",
+            "latitude": 36.7719526,
+            "longitude": 10.2304853,
+            "address": "Mégrine, Ben Arous",
+            "phone": "+216-55-267-585",
+            "rating": 4.2,
+            "description": "Chef de projet",
+            "distance": None
+        },
+        {
+            "id": 30,
+            "name": "Ahmed Waja",
+            "category": "maintenance",
+            "subcategory": "Plomberie, Sanitaire, Chauffage",
+            "latitude": 36.7719526,
+            "longitude": 10.2304853,
+            "address": "Mégrine, Ben Arous",
+            "phone": "+216-22-541-444",
+            "rating": 4.2,
+            "description": "Chef de projet",
+            "distance": None
+        },
+        {
+            "id": 31,
+            "name": "Wassim Jguirim",
+            "category": "maintenance",
+            "subcategory": "Climatisation, Réfrigération, Ventilation",
+            "latitude": 35.6691761,
+            "longitude": 10.8901773,
+            "address": "Sayeda, Monastir",
+            "phone": "+216-55-375-512",
+            "rating": 4.2,
+            "description": "Chef de projet",
+            "distance": None
+        },
+        {
+            "id": 32,
+            "name": "Jawher Hassine",
+            "category": "maintenance",
+            "subcategory": "Textile, Couture, Retouches",
+            "latitude": 35.6726382,
+            "longitude": 10.8926956,
+            "address": "Sayeda, Monastir",
+            "phone": "+216-98-229-401",
+            "rating": 4.2,
+            "description": "Chef de projet",
+            "distance": None
+        },
+        {
+            "id": 33,
+            "name": "Chokri Hassine",
+            "category": "maintenance",
+            "subcategory": "Plasma, Maillon Métallique, Soudure",
+            "latitude": 35.6484986,
+            "longitude": 10.9351791,
+            "address": "Soukrine, Monastir",
+            "phone": "+216-98-407-152",
+            "rating": 4.2,
+            "description": "Chef de projet",
+            "distance": None
         }
 
 ]
