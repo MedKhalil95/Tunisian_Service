@@ -407,8 +407,8 @@ SERVICES = [
             "name": "Ahmed Waja",
             "category": "maintenance",
             "subcategory": "Plomberie, Sanitaire, Chauffage",
-            "latitude": 36.7719526,
-            "longitude": 10.2304853,
+            "latitude": 36.7766905,
+            "longitude": 10.2280636,
             "address": "Mégrine, Ben Arous",
             "phone": "+216-22-541-444",
             "rating": 4.2,
@@ -453,7 +453,20 @@ SERVICES = [
             "rating": 4.2,
             "description": "Chef de projet",
             "distance": None
-        }
+        },
+        {
+            "id": 34,
+            "name": "Adem Lamouchi",
+            "category": "maintenance",
+            "subcategory": "Electricité, Domotique, Éclairage",
+            "latitude": 36.913440,
+            "longitude": 10.186194,
+            "address": "Nour Jaafer, Ariana",
+            "phone": "+216-23-393-916",
+            "rating": 4.2,
+            "description": "Chef de projet",
+            "distance": None
+        },
 
 ]
 
