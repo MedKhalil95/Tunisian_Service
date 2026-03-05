@@ -467,6 +467,32 @@ SERVICES = [
             "description": "Chef de projet",
             "distance": None
         },
+        {
+            "id": 35,
+            "name": "Ahmed Khribi",
+            "category": "Patisserie",
+            "subcategory": "Makroud Baklewa",
+            "latitude": 36.7684486,
+            "longitude": 10.2451034,
+            "address": "Mégrine, Ben Arous",
+            "phone": "+216-98-157-292",
+            "rating": 4.2,
+            "description": "Chef de projet",
+            "distance": None
+        },
+            {
+                "id": 36,
+                "name": "Kaak Warka",
+                "category": "Patisserie",
+                "subcategory": "Kaak Warka Bennesri",
+                "latitude": 36.9098363,
+                "longitude": 10.1889905,
+                "address": "Nour Jaafer, Ariana",
+                "phone": "+216-92-618-131",
+                "rating": 4.2,
+                "description": "Chef de projet",
+                "distance": None
+            }
 
 ]
 
