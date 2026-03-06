@@ -405,7 +405,7 @@ SERVICES = [
         {
             "id": 30,
             "name": "Ahmed Waja",
-            "category": "maintenance",
+            "category": "technician",
             "subcategory": "Plomberie, Sanitaire, Chauffage",
             "latitude": 36.7766905,
             "longitude": 10.2280636,
@@ -418,7 +418,7 @@ SERVICES = [
         {
             "id": 31,
             "name": "Wassim Jguirim",
-            "category": "maintenance",
+            "category": "technician",
             "subcategory": "Climatisation, Réfrigération, Ventilation",
             "latitude": 35.6691761,
             "longitude": 10.8901773,
@@ -431,7 +431,7 @@ SERVICES = [
         {
             "id": 32,
             "name": "Jawher Hassine",
-            "category": "maintenance",
+            "category": "technician",
             "subcategory": "Textile, Couture, Retouches",
             "latitude": 35.6726382,
             "longitude": 10.8926956,
@@ -444,7 +444,7 @@ SERVICES = [
         {
             "id": 33,
             "name": "Chokri Hassine",
-            "category": "maintenance",
+            "category": "technician",
             "subcategory": "Plasma, Maillon Métallique, Soudure",
             "latitude": 35.6484986,
             "longitude": 10.9351791,
@@ -457,7 +457,7 @@ SERVICES = [
         {
             "id": 34,
             "name": "Adem Lamouchi",
-            "category": "maintenance",
+            "category": "technician",
             "subcategory": "Electricité, Domotique, Éclairage",
             "latitude": 36.913440,
             "longitude": 10.186194,
@@ -470,8 +470,8 @@ SERVICES = [
         {
             "id": 35,
             "name": "Ahmed Khribi",
-            "category": "Patisserie",
-            "subcategory": "Makroud Baklewa",
+            "category": "transporter",
+            "subcategory": "Location de Voiture",
             "latitude": 36.7684486,
             "longitude": 10.2451034,
             "address": "Mégrine, Ben Arous",
