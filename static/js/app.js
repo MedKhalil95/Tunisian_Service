@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', function() {
         "Monastir": {lat: 35.7580, lon: 10.7544},
         "Bizerte": {lat: 37.2742, lon: 9.8739},
         "Ariana": {lat: 36.8625, lon: 10.1956},
+        "Ariana Soughra": {lat: 36.900755, lon: 10.18654},
+        "Nour Jaafer": {lat: 36.910930, lon: 10.187334},
         "Ben Arous": {lat: 36.7545, lon: 10.2217},
         "La Marsa": {lat: 36.8762, lon: 10.3243},
         "Megrine": {lat: 36.7737979, lon: 10.2290681},
