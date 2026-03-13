@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         "Tataouine": {lat: 32.9297, lon: 10.4518},
         "Zaghouan": {lat: 36.4029, lon: 10.1429},
         "Siliana": {lat: 36.0849, lon: 9.3708},
-        "Kébili": {lat: 33.7044, lon: 8.9652}
+        "Kebili": {lat: 33.7044, lon: 8.9652}  // Note: Using "Kebili" not "Kébili" for consistency
     };
     
     // Initialize Map
@@ -76,6 +76,145 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize App
     initApp();
+    
+    // ============ HELPER FUNCTIONS FOR CITY TRANSLATION ============
+    
+    /**
+     * Get translated city name for display
+     * @param {string} cityKey - The city key from TUNISIAN_CITIES
+     * @returns {string} Translated city name
+     */
+    function getTranslatedCityName(cityKey) {
+        // Convert city name to a translation key format
+        // Replace spaces and special characters with underscores
+        const translationKey = `city_${cityKey.replace(/[-\s]/g, '_')}`;
+        return t(translationKey, cityKey); // Fallback to original name if translation not found
+    }
+    
+    /**
+     * Display city suggestions with translated names
+     * @param {Array} cities - Array of city objects
+     */
+    function displayCitySuggestions(cities) {
+        const citySuggestions = document.getElementById('city-suggestions');
+        if (!citySuggestions) return;
+        
+        citySuggestions.innerHTML = '';
+        
+        cities.forEach(city => {
+            const item = document.createElement('div');
+            item.className = 'suggestion-item';
+            item.innerHTML = `
+                <i class="fas fa-city"></i>
+                <span>${getTranslatedCityName(city.name)}</span>
+                <small>${city.lat.toFixed(4)}, ${city.lon.toFixed(4)}</small>
+            `;
+            item.addEventListener('click', () => {
+                selectCity(city);
+            });
+            citySuggestions.appendChild(item);
+        });
+        
+        citySuggestions.style.display = 'block';
+    }
+    
+    /**
+     * Populate city dropdown with translated names
+     */
+    function populateCityDropdown() {
+        const cityList = document.getElementById('city-list');
+        if (!cityList) return;
+        
+        cityList.innerHTML = '';
+        
+        // Sort cities alphabetically by translated name for better UX
+        const sortedCities = Object.keys(TUNISIAN_CITIES).sort((a, b) => {
+            const nameA = getTranslatedCityName(a);
+            const nameB = getTranslatedCityName(b);
+            return nameA.localeCompare(nameB);
+        });
+        
+        sortedCities.forEach(city => {
+            const item = document.createElement('div');
+            item.className = 'city-dropdown-item';
+            item.innerHTML = `
+                <i class="fas fa-city"></i>
+                <span>${getTranslatedCityName(city)}</span>
+                <small>${TUNISIAN_CITIES[city].lat.toFixed(4)}, ${TUNISIAN_CITIES[city].lon.toFixed(4)}</small>
+            `;
+            item.addEventListener('click', () => {
+                selectCity({
+                    name: city,
+                    lat: TUNISIAN_CITIES[city].lat,
+                    lon: TUNISIAN_CITIES[city].lon
+                });
+                document.getElementById('city-dropdown').style.display = 'none';
+            });
+            cityList.appendChild(item);
+        });
+    }
+    
+    /**
+     * Select a city and update the UI with translated name
+     * @param {Object} city - City object with name, lat, lon
+     */
+    function selectCity(city) {
+        // Update user location
+        userLocation.lat = city.lat;
+        userLocation.lon = city.lon;
+        
+        // Update input fields
+        latitudeInput.value = userLocation.lat.toFixed(6);
+        longitudeInput.value = userLocation.lon.toFixed(6);
+        
+        // Use the translated city name in the search input
+        document.getElementById('city-search').value = getTranslatedCityName(city.name);
+        
+        // Hide suggestions and dropdown
+        document.getElementById('city-suggestions').style.display = 'none';
+        document.getElementById('city-dropdown').style.display = 'none';
+        
+        // Update map
+        updateUserMarker();
+        map.setView([userLocation.lat, userLocation.lon], 13);
+        showSearchRadius();
+        
+        // Update selected city display
+        updateSelectedCityDisplay();
+        
+        // Show success message with translated city name
+        showMessage(t('city_selected', 'Selected: ') + getTranslatedCityName(city.name), 'success');
+        
+        // Auto-search for services
+        findServices();
+    }
+    
+    /**
+     * Update the selected city display with translated name
+     */
+    function updateSelectedCityDisplay() {
+        const selectedCityDisplay = document.getElementById('selected-city');
+        if (!selectedCityDisplay) return;
+        
+        // Find city name from coordinates
+        let cityKey = '';
+        for (const [key, coords] of Object.entries(TUNISIAN_CITIES)) {
+            if (Math.abs(coords.lat - userLocation.lat) < 0.01 && 
+                Math.abs(coords.lon - userLocation.lon) < 0.01) {
+                cityKey = key;
+                break;
+            }
+        }
+        
+        if (cityKey) {
+            const translatedName = getTranslatedCityName(cityKey);
+            selectedCityDisplay.innerHTML = `<i class="fas fa-check-circle"></i> ${translatedName}`;
+        } else {
+            selectedCityDisplay.innerHTML = `<i class="fas fa-map-pin"></i> ${t('custom_location', 'Custom Location')}`;
+        }
+    }
+    
+    // ============ END OF CITY TRANSLATION HELPER FUNCTIONS ============
     
     function initMap() {
         // Initialize Leaflet map centered on Tunisia
@@ -200,9 +339,25 @@ document.addEventListener('DOMContentLoaded', function() {
             updateSelectedCityDisplay();
             updateMapControlTitles();
             
+            // Refresh city dropdown and suggestions when language changes
+            populateCityDropdown();
+            
             // Refresh service display if there are services
             if (currentServices.length > 0) {
                 displayServices(currentServices);
+            }
+            
+            // Update city search input if it contains a city name
+            const citySearchInput = document.getElementById('city-search');
+            if (citySearchInput && citySearchInput.value) {
+                // Find the city key from the current value
+                for (const [key, coords] of Object.entries(TUNISIAN_CITIES)) {
+                    if (Math.abs(coords.lat - userLocation.lat) < 0.01 && 
+                        Math.abs(coords.lon - userLocation.lon) < 0.01) {
+                        citySearchInput.value = getTranslatedCityName(key);
+                        break;
+                    }
+                }
             }
         });
     }
@@ -230,7 +385,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Filter cities from TUNISIAN_CITIES
             const matches = [];
             for (const [city, coords] of Object.entries(TUNISIAN_CITIES)) {
-                if (city.toLowerCase().includes(searchTerm)) {
+                // Search in both original and translated names for better UX
+                const translatedName = getTranslatedCityName(city).toLowerCase();
+                if (city.toLowerCase().includes(searchTerm) || translatedName.includes(searchTerm)) {
                     matches.push({ name: city, ...coords });
                 }
             }
@@ -273,34 +430,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function populateCityDropdown() {
-        const cityList = document.getElementById('city-list');
-        if (!cityList) return;
-        
-        cityList.innerHTML = '';
-        
-        // Sort cities alphabetically
-        const sortedCities = Object.keys(TUNISIAN_CITIES).sort();
-        
-        sortedCities.forEach(city => {
-            const item = document.createElement('div');
-            item.className = 'city-dropdown-item';
-            item.innerHTML = `
-                <i class="fas fa-city"></i>
-                <span>${city}</span>
-                <small>${TUNISIAN_CITIES[city].lat.toFixed(4)}, ${TUNISIAN_CITIES[city].lon.toFixed(4)}</small>
-            `;
-            item.addEventListener('click', () => {
-                selectCity({
-                    name: city,
-                    lat: TUNISIAN_CITIES[city].lat,
-                    lon: TUNISIAN_CITIES[city].lon
-                });
-                document.getElementById('city-dropdown').style.display = 'none';
-            });
-            cityList.appendChild(item);
-        });
-    }
+    // NOTE: The duplicate populateCityDropdown function below should be REMOVED
+    // The correct one is defined above in the helper functions section
     
     function toggleCityDropdown() {
         const cityDropdown = document.getElementById('city-dropdown');
@@ -311,76 +442,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function displayCitySuggestions(cities) {
-        const citySuggestions = document.getElementById('city-suggestions');
-        citySuggestions.innerHTML = '';
-        
-        cities.forEach(city => {
-            const item = document.createElement('div');
-            item.className = 'suggestion-item';
-            item.innerHTML = `
-                <i class="fas fa-city"></i>
-                <span>${city.name}</span>
-                <small>${city.lat.toFixed(4)}, ${city.lon.toFixed(4)}</small>
-            `;
-            item.addEventListener('click', () => {
-                selectCity(city);
-            });
-            citySuggestions.appendChild(item);
-        });
-        
-        citySuggestions.style.display = 'block';
-    }
+    // NOTE: The duplicate displayCitySuggestions function below should be REMOVED
+    // The correct one is defined above in the helper functions section
     
-    function selectCity(city) {
-        // Update user location
-        userLocation.lat = city.lat;
-        userLocation.lon = city.lon;
-        
-        // Update input fields
-        latitudeInput.value = userLocation.lat.toFixed(6);
-        longitudeInput.value = userLocation.lon.toFixed(6);
-        document.getElementById('city-search').value = city.name;
-        
-        // Hide suggestions and dropdown
-        document.getElementById('city-suggestions').style.display = 'none';
-        document.getElementById('city-dropdown').style.display = 'none';
-        
-        // Update map
-        updateUserMarker();
-        map.setView([userLocation.lat, userLocation.lon], 13);
-        showSearchRadius();
-        
-        // Update selected city display
-        updateSelectedCityDisplay();
-        
-        // Show success message
-        showMessage(t('city_selected', `Selected: ${city.name}`), 'success');
-        
-        // Auto-search for services
-        findServices();
-    }
+    // NOTE: The duplicate selectCity function below should be REMOVED
+    // The correct one is defined above in the helper functions section
     
-    function updateSelectedCityDisplay() {
-        const selectedCityDisplay = document.getElementById('selected-city');
-        if (!selectedCityDisplay) return;
-        
-        // Find city name from coordinates
-        let cityName = '';
-        for (const [city, coords] of Object.entries(TUNISIAN_CITIES)) {
-            if (Math.abs(coords.lat - userLocation.lat) < 0.01 && 
-                Math.abs(coords.lon - userLocation.lon) < 0.01) {
-                cityName = city;
-                break;
-            }
-        }
-        
-        if (cityName) {
-            selectedCityDisplay.innerHTML = `<i class="fas fa-check-circle"></i> ${cityName}`;
-        } else {
-            selectedCityDisplay.innerHTML = `<i class="fas fa-map-pin"></i> ${t('custom_location', 'Custom Location')}`;
-        }
-    }
+    // NOTE: The duplicate updateSelectedCityDisplay function below should be REMOVED
+    // The correct one is defined above in the helper functions section
     
     function updateUserLocationFromInputs() {
         const lat = parseFloat(latitudeInput.value);
