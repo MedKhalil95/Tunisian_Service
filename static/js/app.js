@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const translatedName = getTranslatedCityName(cityKey);
             selectedCityDisplay.innerHTML = `<i class="fas fa-check-circle"></i> ${translatedName}`;
         } else {
-            selectedCityDisplay.innerHTML = `<i class="fas fa-map-pin"></i> ${t('custom_location', 'Custom Location')}`;
+            selectedCityDisplay.innerHTML = `<i class="fas fa-map-pin"></i> ${t('custom_location')}`;
         }
     }
     

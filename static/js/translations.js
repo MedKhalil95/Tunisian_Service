@@ -79,6 +79,7 @@ class TranslationSystem {
                 "apply_coordinates": "تطبيق الإحداثيات",
                 "city_selected": "تم اختيار: ",
                 "location_updated": "تم تحديث الموقع من الإحداثيات المدخلة",
+                "custom_location": "موقع مخصص",
                 
                 // Language
                 'language_changed': 'تم تغيير اللغة إلى العربية',
@@ -197,6 +198,7 @@ class TranslationSystem {
                 "apply_coordinates": "Apply Coordinates",
                 "city_selected": "Selected: ",
                 "location_updated": "Location updated from entered coordinates",
+                "custom_location": "Custom Location",
                 
                 // Language
                 'language_changed': 'Language changed to English',
@@ -314,7 +316,7 @@ class TranslationSystem {
                 "apply_coordinates": "Appliquer les Coordonnées",
                 "city_selected": "Sélectionné: ",
                 "location_updated": "Emplacement mis à jour à partir des coordonnées saisies",
-                
+                "custom_location": "Emplacement Personnalisé",
                 // Language
                 'language_changed': 'Langue changée en français',
                 'city_Tunis': 'Tunis',
