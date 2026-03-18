@@ -68,7 +68,13 @@ document.addEventListener('DOMContentLoaded', function() {
         "Tataouine": {lat: 32.9297, lon: 10.4518},
         "Zaghouan": {lat: 36.4029, lon: 10.1429},
         "Siliana": {lat: 36.0849, lon: 9.3708},
-        "Kebili": {lat: 33.7044, lon: 8.9652}  // Note: Using "Kebili" not "Kébili" for consistency
+        "Kebili": {lat: 33.7044, lon: 8.9652},
+        "Sayeda": {lat: 35.6682576, lon: 10.8913994},
+        "Ksar Helal": {lat: 35.6425099, lon: 10.8914524},
+        "Sidi Bouzid": {lat:35.0354386, lon: 9.4839392},
+        "Metlaoui": {lat: 34.3157811, lon: 8.4019284},
+        "Moknine": {lat: 35.6314505, lon:10.9023109}
+        // Note: Using "Kebili" not "Kébili" for consistency
     };
     
     // Initialize Map

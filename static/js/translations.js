@@ -81,6 +81,7 @@ class TranslationSystem {
                 "location_updated": "تم تحديث الموقع من الإحداثيات المدخلة",
                 
                 // Language
+                'language_changed': 'تم تغيير اللغة إلى العربية',
                 'language': 'اللغة',
                 'city_Tunis': 'تونس',
                 'city_Sousse': 'سوسة',
@@ -113,7 +114,12 @@ class TranslationSystem {
                 'city_Tataouine': 'تطاوين',
                 'city_Zaghouan': 'زغوان',
                 'city_Siliana': 'سليانة',
-                'city_Kebili': 'قبلي'
+                'city_Kebili': 'قبلي',
+                'city_Sayeda': 'صيادة',
+                'city_Ksar_Helal': 'قصر هلال',
+                'city_Sidi_Bouzid': 'سيدي بوزيد',
+                'city_Metlaoui': 'متلوي',
+                'city_Moknine': 'المكنين'
             },
             'en': {
                 // Header
@@ -225,7 +231,12 @@ class TranslationSystem {
                 'city_Tataouine': 'Tataouine',
                 'city_Zaghouan': 'Zaghouan',
                 'city_Siliana': 'Siliana',
-                'city_Kebili': 'Kebili'
+                'city_Kebili': 'Kebili',
+                'city_Sayeda': 'Sayeda',
+                'city_Ksar_Helal': 'Ksar Helal',
+                'city_Sidi_Bouzid': 'Sidi Bouzid',
+                'city_Metlaoui': 'Metlaoui',
+                'city_Moknine': 'Moknine'
             },
             'fr': {
                 // Header
@@ -337,7 +348,12 @@ class TranslationSystem {
                 'city_Tataouine': 'Tataouine',  
                 'city_Zaghouan': 'Zaghouan',
                 'city_Siliana': 'Siliana',
-                'city_Kebili': 'Kébili'
+                'city_Kebili': 'Kébili',
+                'city_Sayeda': 'Sayeda',
+                'city_Ksar_Helal': 'Ksar Helal',
+                'city_Sidi_Bouzid': 'Sidi Bouzid',
+                'city_Metlaoui': 'Métlaoui',
+                'city_Moknine': 'Moknine'
             }
         };
         
