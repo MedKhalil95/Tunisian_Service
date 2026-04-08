@@ -492,6 +492,19 @@ SERVICES = [
                 "rating": 4.2,
                 "description": "Chef de projet",
                 "distance": None
+            },
+            {
+                "id": 37,
+                "name": "Securas",
+                "category": "Réparation",
+                "subcategory": "Réparation",
+                "latitude": 36.852466,
+                "longitude": 10.204746,
+                "address": "Charguia 2, Tunis",
+                "phone": "+216-70-837-200",
+                "rating": 4.2,
+                "description": "Bureau du controle technique de sécurité des bâtiments",
+                "distance": None
             }
 
 ]
@@ -511,7 +524,7 @@ SUBCATEGORIES = {
     "transporter": ["taxi", "delivery", "moving", "ride_sharing"],
     "doctor": ["general", "dentist", "pediatrician", "cardiologist"],
     "pharmacy": ["drugstore"],
-    "mechanic": ["auto"],
+    "mechanic": ["auto", "motorcycle", "bicycle", "Réparation"],
     "restaurant": ["dining"],
     "technician": ["computer"]
 }
