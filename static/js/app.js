@@ -753,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="service-phone">
                 <i class="fas fa-phone"></i>
-                <span>${phoneFormatted}</span>
+                <a href="tel:${service.phone}" onclick="event.stopPropagation()" class="phone-link">${phoneFormatted}</a>
             </div>
             <div class="service-rating">
                 <i class="fas fa-star"></i> ${service.rating}/5
@@ -817,7 +817,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         ${service.distance} ${t('km', 'km')}
                     </div>
                     <p style="margin: 5px 0;"><strong>${t('address', 'Address')}:</strong> ${service.address}</p>
-                    <p style="margin: 5px 0;"><strong>${t('phone', 'Phone')}:</strong> ${service.phone}</p>
+                    <p style="margin: 5px 0;"><strong>${t('phone', 'Phone')}:</strong> <a href="tel:${service.phone}" class="phone-link" style="color: #3498db; text-decoration: none; font-weight: 500;">${service.phone}</a></p>
                     <p style="margin: 5px 0;"><strong>${t('rating', 'Rating')}:</strong> ${service.rating}/5</p>
                     <p style="margin: 10px 0 0 0; font-size: 0.9rem; color: #7f8c8d;">${service.description}</p>
                     <button onclick="showServiceDetailsFromMap(${service.id})" style="background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-top: 10px; cursor: pointer; width: 100%;">
@@ -945,7 +945,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="modal-detail">
                 <i class="fas fa-phone"></i>
                 <div>
-                    <strong>${t('phone', 'Phone')}:</strong> ${phoneFormatted}
+                    <strong>${t('phone', 'Phone')}:</strong> <a href="tel:${service.phone}" class="phone-link">${phoneFormatted}</a>
                 </div>
             </div>
             

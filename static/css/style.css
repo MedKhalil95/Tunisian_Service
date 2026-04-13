@@ -981,3 +981,30 @@ footer {
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
 }
+/* Clickable phone number styles */
+.phone-link {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+    cursor: pointer;
+}
+
+.phone-link:hover {
+    color: #1a5276;
+    text-decoration: underline;
+}
+
+.service-phone .phone-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.service-phone .phone-link::after {
+    content: '\f095';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 0.75em;
+    opacity: 0.7;
+}
