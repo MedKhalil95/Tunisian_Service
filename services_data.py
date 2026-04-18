@@ -505,6 +505,19 @@ SERVICES = [
                 "rating": 4.2,
                 "description": "Bureau du controle technique de sécurité des bâtiments",
                 "distance": None
+            },
+            {
+                "id": 38,
+                "name": "Plus Security",
+                "category": "Réparation",
+                "subcategory": "Réparation",
+                "latitude": 36.841391,
+                "longitude": 10.207906,
+                "address": "Charguia 1, Tunis",
+                "phone": "+216-71-771-400",
+                "rating": 4.2,
+                "description": "La sécurité est notre spécialitée",
+                "distance": None
             }
 
 ]
